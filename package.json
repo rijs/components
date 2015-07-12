@@ -1,0 +1,33 @@
+{
+  "name": "components",
+  "version": "0.0.0",
+  "main": "dist",
+  "author": "Pedram Emrouznejad (https://github.com/pemrouz)",
+  "scripts": {
+    "ignore": "find ./dist -type f -exec sed -i \"s/var _interopRequire/\\/* istanbul ignore next *\\/\\nvar _interopRequire/g\" {} ;",
+    "babel": "babel src -d dist",
+    "bundle": "browserify dist/index.js -o dist/client.js",
+    "minify": "uglifyjs dist/client.js -m -c drop_console,dead_code -d debug=false -o dist/client.min.js",
+    "build": "npm run babel && npm run ignore && npm run bundle && npm run minify",
+    "test": "browserify test/client.js -o dist/test.js && start test/index.html",
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && rm -rf ./coverage",
+    "watch": "watch \"npm run build && npm test\" src/ test/"
+  },
+  "license": "pemrouz.mit-license.org",
+  "devDependencies": {
+    "babel": "^4.6.3",
+    "browserify": "^9.0.3",
+    "chai": "^2.3.0",
+    "core": "git://github.com/rijs/core",
+    "data": "git://github.com/rijs/data",
+    "fn": "git://github.com/rijs/fn",
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.13",
+    "mocha": "^2.2.4",
+    "mocha-lcov-reporter": "0.0.2",
+    "uglify-js": "^2.4.16"
+  },
+  "dependencies": {
+    "utilise": "git://github.com/utilise/utilise"
+  }
+}
