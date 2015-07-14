@@ -3,9 +3,9 @@ var expect = require('chai').expect
   , attr = require('utilise/attr')
   , key = require('utilise/key')
   , components = require('../')
-  , core = require('core')
-  , data = require('data')
-  , fn = require('fn')
+  , core = require('rijs.core')
+  , data = require('rijs.data')
+  , fn = require('rijs.fn')
   , container = document.createElement('div')
   , el1, el2, el3
   , ripple = components(fn(data(core())))
