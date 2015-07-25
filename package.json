@@ -4,14 +4,13 @@
   "main": "dist",
   "author": "Pedram Emrouznejad (https://github.com/pemrouz)",
   "scripts": {
-    "ignore": "find ./dist -type f -exec sed -i \"s/var _interopRequire/\\/* istanbul ignore next *\\/\\nvar _interopRequire/g\" {} ;",
+    "ignore": "find ./dist -type f -exec sed -i \"s/var _interopRequire/\\/* istanbul ignore next *\\/\\nvar _interopRequire/g\" {} ';'",
     "babel": "babel src -d dist",
     "bundle": "browserify dist/index.js -o dist/client.js",
+    "clean": "rm -rf dist && mkdir dist",
     "minify": "uglifyjs dist/client.js -m -c drop_console,dead_code -d debug=false -o dist/client.min.js",
-    "build": "npm run babel && npm run ignore && npm run bundle && npm run minify",
-    "test": "browserify test/client.js -o dist/test.js && start test/index.html",
-    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && rm -rf ./coverage",
-    "watch": "watch \"npm run build && npm test\" src/ test/"
+    "build": "npm run clean && npm run babel && npm run ignore && npm run bundle && npm run minify",
+    "test": "popper"
   },
   "license": "pemrouz.mit-license.org",
   "devDependencies": {
@@ -21,6 +20,7 @@
     "rijs.core": "git://github.com/rijs/core",
     "rijs.data": "git://github.com/rijs/data",
     "rijs.fn": "git://github.com/rijs/fn",
+    "popper": "*",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.13",
     "mocha": "^2.2.4",
