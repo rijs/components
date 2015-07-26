@@ -22,6 +22,10 @@ function components(ripple) {
   }log("creating");
 
   if (!customEls) document.body ? polyfill(ripple)() : document.addEventListener("DOMContentLoaded", polyfill(ripple));
+
+  values(ripple.types).map(function (type) {
+    return type.parse = proxy(clean(ripple), type.parse || identity);
+  });
   key("types.application/javascript.render", wrap(fn(ripple)))(ripple);
   key("types.application/data.render", wrap(data(ripple)))(ripple);
   ripple.draw = draw(ripple);
@@ -109,6 +113,16 @@ function drawCustomEls(ripple) {
     mutations.filter(key("attributeName")).filter(by("target", isCustomElement)).filter(onlyIfDifferent).map(ripple.draw);
 
     mutations.map(key("addedNodes")).map(to.arr).reduce(flatten).filter(isCustomElement).map(ripple.draw);
+  };
+}
+
+// clean local headers for transport
+function clean(ripple) {
+  return function (res) {
+    var existing = ripple.resources[res.name];
+    existing && delete existing.headers.pending;
+    delete res.headers.pending;
+    return res;
   };
 }
 
