@@ -17,7 +17,7 @@ export default function components(ripple){
     ? polyfill(ripple)()
     : document.addEventListener('DOMContentLoaded', polyfill(ripple))
 
-  values(ripple.types).map(type => type.parse = proxy(clean(ripple), type.parse || identity))
+  values(ripple.types).map(type => type.parse = proxy(type.parse || identity, clean(ripple)))
   key('types.application/javascript.render', wrap(fn(ripple)))(ripple)
   key('types.application/data.render', wrap(data(ripple)))(ripple)
   ripple.draw = draw(ripple)
@@ -133,8 +133,6 @@ function drawCustomEls(ripple) {
 // clean local headers for transport
 function clean(ripple){
   return function(res){
-    var existing = ripple.resources[res.name]
-    existing && (delete existing.headers.pending)
     delete res.headers.pending
     return res
   }

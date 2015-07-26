@@ -24,7 +24,7 @@ function components(ripple) {
   if (!customEls) document.body ? polyfill(ripple)() : document.addEventListener("DOMContentLoaded", polyfill(ripple));
 
   values(ripple.types).map(function (type) {
-    return type.parse = proxy(clean(ripple), type.parse || identity);
+    return type.parse = proxy(type.parse || identity, clean(ripple));
   });
   key("types.application/javascript.render", wrap(fn(ripple)))(ripple);
   key("types.application/data.render", wrap(data(ripple)))(ripple);
@@ -119,8 +119,6 @@ function drawCustomEls(ripple) {
 // clean local headers for transport
 function clean(ripple) {
   return function (res) {
-    var existing = ripple.resources[res.name];
-    existing && delete existing.headers.pending;
     delete res.headers.pending;
     return res;
   };

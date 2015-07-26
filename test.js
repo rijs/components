@@ -187,15 +187,15 @@ describe('Custom Elements', function(){
     var count = 0
 
     ripple('component-2', function(){ count++ })
-    ripple('array', [1])
-    ripple('array', [2])
-    ripple('array', [3])
-    ripple('array', [4])
-    ripple('array', [5])
+    ripple('array').push(1)
+    ripple('array').push(2)
+    ripple('array').push(3)
+    ripple('array').push(4)
+    ripple('array').push(5)
     
     setTimeout(function(){
-      expect(count).to.equal(2)
-      expect(ripple('array')).to.eql([5])
+      expect(count).to.equal(1)
+      expect(ripple('array')).to.eql([1,2,3,1,2,3,4,5])
       done()
     }, 50)
   })
