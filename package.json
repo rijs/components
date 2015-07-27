@@ -17,9 +17,9 @@
     "babel": "^4.6.3",
     "browserify": "^9.0.3",
     "chai": "^2.3.0",
-    "rijs.core": "git://github.com/rijs/core",
-    "rijs.data": "git://github.com/rijs/data",
-    "rijs.fn": "git://github.com/rijs/fn",
+    "rijs.core": "*",
+    "rijs.data": "*",
+    "rijs.fn": "*",
     "popper": "*",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.13",
@@ -28,6 +28,6 @@
     "uglify-js": "^2.4.16"
   },
   "dependencies": {
-    "utilise": "git://github.com/utilise/utilise"
+    "utilise": "*"
   }
 }
