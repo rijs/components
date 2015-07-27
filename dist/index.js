@@ -136,6 +136,8 @@ var resourcify = _interopRequire(require("utilise/resourcify"));
 
 var includes = _interopRequire(require("utilise/includes"));
 
+var identity = _interopRequire(require("utilise/identity"));
+
 var flatten = _interopRequire(require("utilise/flatten"));
 
 var prepend = _interopRequire(require("utilise/prepend"));
@@ -145,6 +147,8 @@ var header = _interopRequire(require("utilise/header"));
 var client = _interopRequire(require("utilise/client"));
 
 var values = _interopRequire(require("utilise/values"));
+
+var proxy = _interopRequire(require("utilise/proxy"));
 
 var attr = _interopRequire(require("utilise/attr"));
 

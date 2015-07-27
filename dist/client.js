@@ -137,6 +137,8 @@ var resourcify = _interopRequire(require("utilise/resourcify"));
 
 var includes = _interopRequire(require("utilise/includes"));
 
+var identity = _interopRequire(require("utilise/identity"));
+
 var flatten = _interopRequire(require("utilise/flatten"));
 
 var prepend = _interopRequire(require("utilise/prepend"));
@@ -146,6 +148,8 @@ var header = _interopRequire(require("utilise/header"));
 var client = _interopRequire(require("utilise/client"));
 
 var values = _interopRequire(require("utilise/values"));
+
+var proxy = _interopRequire(require("utilise/proxy"));
 
 var attr = _interopRequire(require("utilise/attr"));
 
@@ -181,7 +185,7 @@ var mutation = client && window.MutationRecord || noop,
     customEls = client && !!document.registerElement,
     isAttached = customEls ? "html *, :host-context(html) *" : "html *";
 client && (Element.prototype.matches = Element.prototype.matches || Element.prototype.msMatchesSelector);
-},{"./types/data":2,"./types/fn":3,"utilise/all":4,"utilise/attr":5,"utilise/body":6,"utilise/by":7,"utilise/client":8,"utilise/err":9,"utilise/flatten":10,"utilise/header":11,"utilise/includes":12,"utilise/is":13,"utilise/key":14,"utilise/lo":15,"utilise/log":16,"utilise/noop":82,"utilise/prepend":83,"utilise/resourcify":84,"utilise/to":85,"utilise/values":86,"utilise/wrap":87}],2:[function(require,module,exports){
+},{"./types/data":2,"./types/fn":3,"utilise/all":4,"utilise/attr":5,"utilise/body":6,"utilise/by":7,"utilise/client":8,"utilise/err":9,"utilise/flatten":10,"utilise/header":11,"utilise/identity":12,"utilise/includes":13,"utilise/is":14,"utilise/key":15,"utilise/lo":16,"utilise/log":17,"utilise/noop":86,"utilise/prepend":87,"utilise/proxy":88,"utilise/resourcify":89,"utilise/to":90,"utilise/values":91,"utilise/wrap":92}],2:[function(require,module,exports){
 "use strict";
 
 /* istanbul ignore next */
@@ -241,38 +245,40 @@ var all = _interopRequire(require("utilise/all"));
 var customEls = client && !!document.registerElement;
 },{"utilise/all":4,"utilise/client":8,"utilise/header":11}],4:[function(require,module,exports){
 module.exports = require('all')
-},{"all":17}],5:[function(require,module,exports){
+},{"all":18}],5:[function(require,module,exports){
 module.exports = require('attr')
-},{"attr":19}],6:[function(require,module,exports){
+},{"attr":20}],6:[function(require,module,exports){
 module.exports = require('body')
-},{"body":21}],7:[function(require,module,exports){
+},{"body":22}],7:[function(require,module,exports){
 module.exports = require('by')
-},{"by":26}],8:[function(require,module,exports){
+},{"by":27}],8:[function(require,module,exports){
 module.exports = require('client')
-},{"client":32}],9:[function(require,module,exports){
+},{"client":33}],9:[function(require,module,exports){
 module.exports = require('err')
-},{"err":33}],10:[function(require,module,exports){
+},{"err":34}],10:[function(require,module,exports){
 module.exports = require('flatten')
-},{"flatten":37}],11:[function(require,module,exports){
+},{"flatten":38}],11:[function(require,module,exports){
 module.exports = require('header')
-},{"header":38}],12:[function(require,module,exports){
+},{"header":39}],12:[function(require,module,exports){
+module.exports = require('identity')
+},{"identity":41}],13:[function(require,module,exports){
 module.exports = require('includes')
-},{"includes":40}],13:[function(require,module,exports){
+},{"includes":42}],14:[function(require,module,exports){
 module.exports = require('is')
-},{"is":41}],14:[function(require,module,exports){
+},{"is":43}],15:[function(require,module,exports){
 module.exports = require('key')
-},{"key":42}],15:[function(require,module,exports){
+},{"key":44}],16:[function(require,module,exports){
 module.exports = require('lo')
-},{"lo":46}],16:[function(require,module,exports){
+},{"lo":48}],17:[function(require,module,exports){
 module.exports = require('log')
-},{"log":47}],17:[function(require,module,exports){
+},{"log":49}],18:[function(require,module,exports){
 var to = require('to')
 
 module.exports = function all(selector, doc){
   var prefix = !doc && document.head.createShadowRoot ? 'html /deep/ ' : ''
   return to.arr((doc || document).querySelectorAll(prefix+selector))
 }
-},{"to":18}],18:[function(require,module,exports){
+},{"to":19}],19:[function(require,module,exports){
 module.exports = { 
   arr : toArray
 }
@@ -280,7 +286,7 @@ module.exports = {
 function toArray(d){
   return Array.prototype.slice.call(d, 0)
 }
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var is = require('is')
 
 module.exports = function attr(d, name, value) {
@@ -293,7 +299,7 @@ module.exports = function attr(d, name, value) {
       && d.attributes.getNamedItem(name).value
 }
 
-},{"is":20}],20:[function(require,module,exports){
+},{"is":21}],21:[function(require,module,exports){
 module.exports = is
 is.fn     = isFunction
 is.str    = isString
@@ -366,7 +372,7 @@ function isIn(set) {
          :  d in set
   }
 }
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 var key = require('key')
 
 module.exports = function body(ripple){
@@ -374,7 +380,7 @@ module.exports = function body(ripple){
     return key([name, 'body'].join('.'))(ripple.resources)
   }
 }
-},{"key":22}],22:[function(require,module,exports){
+},{"key":23}],23:[function(require,module,exports){
 var is = require('is')
   , str = require('str')
 
@@ -398,9 +404,9 @@ module.exports = function key(k, v){
     }
   }
 }
-},{"is":23,"str":24}],23:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],24:[function(require,module,exports){
+},{"is":24,"str":25}],24:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],25:[function(require,module,exports){
 var is = require('is') 
 
 module.exports = function str(d){
@@ -410,9 +416,9 @@ module.exports = function str(d){
        : is.obj(d) ? JSON.stringify(d)
        : String(d)
 }
-},{"is":25}],25:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],26:[function(require,module,exports){
+},{"is":26}],26:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],27:[function(require,module,exports){
 var key = require('key')
   , is  = require('is')
 
@@ -427,19 +433,19 @@ module.exports = function by(k, v){
          : d == v
   }
 }
-},{"is":27,"key":28}],27:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],28:[function(require,module,exports){
-arguments[4][22][0].apply(exports,arguments)
-},{"dup":22,"is":29,"str":30}],29:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],30:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"dup":24,"is":31}],31:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],32:[function(require,module,exports){
+},{"is":28,"key":29}],28:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],29:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"dup":23,"is":30,"str":31}],30:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],31:[function(require,module,exports){
+arguments[4][25][0].apply(exports,arguments)
+},{"dup":25,"is":32}],32:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],33:[function(require,module,exports){
 module.exports = typeof window != 'undefined'
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var owner = require('owner')
   , to = require('to')
 
@@ -451,20 +457,20 @@ module.exports = function err(prefix){
     return console.error.apply(console, args), d
   }
 }
-},{"owner":34,"to":36}],34:[function(require,module,exports){
+},{"owner":35,"to":37}],35:[function(require,module,exports){
 (function (global){
 module.exports = require('client') ? /* istanbul ignore next */ window : global
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"client":35}],35:[function(require,module,exports){
-arguments[4][32][0].apply(exports,arguments)
-},{"dup":32}],36:[function(require,module,exports){
-arguments[4][18][0].apply(exports,arguments)
-},{"dup":18}],37:[function(require,module,exports){
+},{"client":36}],36:[function(require,module,exports){
+arguments[4][33][0].apply(exports,arguments)
+},{"dup":33}],37:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"dup":19}],38:[function(require,module,exports){
 module.exports = function flatten(p,v){ 
   return (p = p || []), p.concat(v) 
 }
 
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 var has = require('has')
 
 module.exports = function header(header, value) {
@@ -477,32 +483,36 @@ module.exports = function header(header, value) {
                                    : d['headers'][header] == value
   }
 }
-},{"has":39}],39:[function(require,module,exports){
+},{"has":40}],40:[function(require,module,exports){
 module.exports = function has(o, k) {
   return k in o
 }
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
+module.exports = function identity(d) {
+  return d
+}
+},{}],42:[function(require,module,exports){
 module.exports = function includes(pattern){
   return function(d){
     return ~d.indexOf(pattern)
   }
 }
-},{}],41:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],42:[function(require,module,exports){
-arguments[4][22][0].apply(exports,arguments)
-},{"dup":22,"is":43,"str":44}],43:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],44:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"dup":24,"is":45}],45:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],46:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],44:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"dup":23,"is":45,"str":46}],45:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],46:[function(require,module,exports){
+arguments[4][25][0].apply(exports,arguments)
+},{"dup":25,"is":47}],47:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],48:[function(require,module,exports){
 module.exports = function lo(d){
   return (d || '').toLowerCase()
 }
 
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 var is = require('is')
   , to = require('to')
   , owner = require('owner')
@@ -516,23 +526,34 @@ module.exports = function log(prefix){
     return console.log.apply(console, args), d
   }
 }
-},{"is":48,"owner":49,"to":51}],48:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],49:[function(require,module,exports){
-arguments[4][34][0].apply(exports,arguments)
-},{"client":50,"dup":34}],50:[function(require,module,exports){
-arguments[4][32][0].apply(exports,arguments)
-},{"dup":32}],51:[function(require,module,exports){
-arguments[4][18][0].apply(exports,arguments)
-},{"dup":18}],52:[function(require,module,exports){
+},{"is":50,"owner":51,"to":53}],50:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],51:[function(require,module,exports){
+arguments[4][35][0].apply(exports,arguments)
+},{"client":52,"dup":35}],52:[function(require,module,exports){
+arguments[4][33][0].apply(exports,arguments)
+},{"dup":33}],53:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"dup":19}],54:[function(require,module,exports){
 module.exports = function noop(){}
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 module.exports = function prepend(v) {
   return function(d){
     return v+d
   }
 }
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
+var is = require('is')
+
+module.exports = function proxy(fn, ret, ctx){ 
+  return function(){
+    var result = fn.apply(ctx || this, arguments)
+    return is.fn(ret) ? ret(result) : ret || result
+  }
+}
+},{"is":57}],57:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],58:[function(require,module,exports){
 var is = require('is')
   , body = require('body')
   , first = require('first')
@@ -550,30 +571,30 @@ module.exports = function resourcify(ripple){
            )
   }
 }
-},{"body":55,"first":60,"is":61,"values":62}],55:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"dup":21,"key":56}],56:[function(require,module,exports){
+},{"body":59,"first":64,"is":65,"values":66}],59:[function(require,module,exports){
 arguments[4][22][0].apply(exports,arguments)
-},{"dup":22,"is":57,"str":58}],57:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],58:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"dup":24,"is":59}],59:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],60:[function(require,module,exports){
+},{"dup":22,"key":60}],60:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"dup":23,"is":61,"str":62}],61:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],62:[function(require,module,exports){
+arguments[4][25][0].apply(exports,arguments)
+},{"dup":25,"is":63}],63:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],64:[function(require,module,exports){
 module.exports = function first(d){
   return d[0]
 }
-},{}],61:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],62:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],66:[function(require,module,exports){
 var keys = require('keys')
   , from = require('from')
 
 module.exports = function values(o) {
   return !o ? [] : keys(o).map(from(o))
 }
-},{"from":63,"keys":70}],63:[function(require,module,exports){
+},{"from":67,"keys":74}],67:[function(require,module,exports){
 var datum = require('datum')
   , key = require('key')
 
@@ -589,64 +610,66 @@ function from(o){
 function fromParent(k){
   return datum(this.parentNode)[k]
 }
-},{"datum":64,"key":66}],64:[function(require,module,exports){
+},{"datum":68,"key":70}],68:[function(require,module,exports){
 var sel = require('sel')
 
 module.exports = function datum(node){
   return sel(node).datum()
 }
-},{"sel":65}],65:[function(require,module,exports){
+},{"sel":69}],69:[function(require,module,exports){
 module.exports = function sel(){
   return d3.select.apply(this, arguments)
 }
-},{}],66:[function(require,module,exports){
-arguments[4][22][0].apply(exports,arguments)
-},{"dup":22,"is":67,"str":68}],67:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],68:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"dup":24,"is":69}],69:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],70:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"dup":23,"is":71,"str":72}],71:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],72:[function(require,module,exports){
+arguments[4][25][0].apply(exports,arguments)
+},{"dup":25,"is":73}],73:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],74:[function(require,module,exports){
 module.exports = function keys(o) {
   return Object.keys(o || {})
 }
-},{}],71:[function(require,module,exports){
-arguments[4][18][0].apply(exports,arguments)
-},{"dup":18}],72:[function(require,module,exports){
-arguments[4][62][0].apply(exports,arguments)
-},{"dup":62,"from":73,"keys":80}],73:[function(require,module,exports){
-arguments[4][63][0].apply(exports,arguments)
-},{"datum":74,"dup":63,"key":76}],74:[function(require,module,exports){
-arguments[4][64][0].apply(exports,arguments)
-},{"dup":64,"sel":75}],75:[function(require,module,exports){
-arguments[4][65][0].apply(exports,arguments)
-},{"dup":65}],76:[function(require,module,exports){
-arguments[4][22][0].apply(exports,arguments)
-},{"dup":22,"is":77,"str":78}],77:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],78:[function(require,module,exports){
-arguments[4][24][0].apply(exports,arguments)
-},{"dup":24,"is":79}],79:[function(require,module,exports){
-arguments[4][20][0].apply(exports,arguments)
-},{"dup":20}],80:[function(require,module,exports){
-arguments[4][70][0].apply(exports,arguments)
-},{"dup":70}],81:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
+arguments[4][19][0].apply(exports,arguments)
+},{"dup":19}],76:[function(require,module,exports){
+arguments[4][66][0].apply(exports,arguments)
+},{"dup":66,"from":77,"keys":84}],77:[function(require,module,exports){
+arguments[4][67][0].apply(exports,arguments)
+},{"datum":78,"dup":67,"key":80}],78:[function(require,module,exports){
+arguments[4][68][0].apply(exports,arguments)
+},{"dup":68,"sel":79}],79:[function(require,module,exports){
+arguments[4][69][0].apply(exports,arguments)
+},{"dup":69}],80:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"dup":23,"is":81,"str":82}],81:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],82:[function(require,module,exports){
+arguments[4][25][0].apply(exports,arguments)
+},{"dup":25,"is":83}],83:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],84:[function(require,module,exports){
+arguments[4][74][0].apply(exports,arguments)
+},{"dup":74}],85:[function(require,module,exports){
 module.exports = function wrap(d){
   return function(){
     return d
   }
 }
-},{}],82:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 module.exports = require('noop')
-},{"noop":52}],83:[function(require,module,exports){
+},{"noop":54}],87:[function(require,module,exports){
 module.exports = require('prepend')
-},{"prepend":53}],84:[function(require,module,exports){
+},{"prepend":55}],88:[function(require,module,exports){
+module.exports = require('proxy')
+},{"proxy":56}],89:[function(require,module,exports){
 module.exports = require('resourcify')
-},{"resourcify":54}],85:[function(require,module,exports){
+},{"resourcify":58}],90:[function(require,module,exports){
 module.exports = require('to')
-},{"to":71}],86:[function(require,module,exports){
+},{"to":75}],91:[function(require,module,exports){
 module.exports = require('values')
-},{"values":72}],87:[function(require,module,exports){
+},{"values":76}],92:[function(require,module,exports){
 module.exports = require('wrap')
-},{"wrap":81}]},{},[1]);
+},{"wrap":85}]},{},[1]);

@@ -148,11 +148,13 @@ function isCustomElement(d) {
 
 import resourcify from 'utilise/resourcify'
 import includes from 'utilise/includes'
+import identity from 'utilise/identity'
 import flatten from 'utilise/flatten'
 import prepend from 'utilise/prepend'
 import header from 'utilise/header'
 import client from 'utilise/client'
 import values from 'utilise/values'
+import proxy from 'utilise/proxy'
 import attr from 'utilise/attr'
 import body from 'utilise/body'
 import noop from 'utilise/noop'
