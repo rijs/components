@@ -1,0 +1,20 @@
+# Ripple | Components
+[![Coverage Status](https://coveralls.io/repos/rijs/components/badge.svg?branch=master&service=github)](https://coveralls.io/github/rijs/components?branch=master)
+[![Build Status](https://travis-ci.org/rijs/components.svg)](https://travis-ci.org/rijs/components)
+
+
+Renders Web Components. Given the following markup on your page:
+
+```html
+<component-name data="something">
+```
+
+With a `component-name` (function) and `something` (data) registered in Ripple, it will invoke `component-name(<el>, something)`.
+
+Browsers natively supporting Custom Elements will have them upgraded automatically, modern browsers will reactively update using MutationObservers and older browsers will use polling. You can also manually invoke renders:
+
+```js
+ripple.draw(<el> | resource object | resource name)
+```
+
+If the first parameter is a DOM element, it will rerender that. If it is a resource (name or object), it will rerender anything on your page that depends on that. 
