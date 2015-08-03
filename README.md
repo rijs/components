@@ -11,10 +11,12 @@ Renders Web Components. Given the following markup on your page:
 
 With a `component-name` (function) and `something` (data) registered in Ripple, it will invoke `component-name.call(<el>, something)` whenever a change is detected in either of those resources. Internally, this is basically implemented as follows but in a more generic form:
 
+```js
 ripple('something').on('change', function(){
   all('[data=something]')
     .map(ripple.draw)
 })
+```
 
 Browsers natively supporting Custom Elements will have them upgraded automatically, modern browsers will reactively update using MutationObservers and older browsers will use polling. You can also manually invoke renders:
 
