@@ -9,7 +9,12 @@ Renders Web Components. Given the following markup on your page:
 <component-name data="something">
 ```
 
-With a `component-name` (function) and `something` (data) registered in Ripple, it will invoke `component-name(<el>, something)`.
+With a `component-name` (function) and `something` (data) registered in Ripple, it will invoke `component-name.call(<el>, something)` whenever a change is detected in either of those resources. Internally, this is basically implemented as follows but in a more generic form:
+
+ripple('something').on('change', function(){
+  all('[data=something]')
+    .map(ripple.draw)
+})
 
 Browsers natively supporting Custom Elements will have them upgraded automatically, modern browsers will reactively update using MutationObservers and older browsers will use polling. You can also manually invoke renders:
 
@@ -17,4 +22,4 @@ Browsers natively supporting Custom Elements will have them upgraded automatical
 ripple.draw(<el> | resource object | resource name)
 ```
 
-If the first parameter is a DOM element, it will rerender that. If it is a resource (name or object), it will rerender anything on your page that depends on that. 
+If the first parameter is a DOM element, it will rerender that. If it is a resource (name or object), it will rerender anything on your page that depends on that resource. 
