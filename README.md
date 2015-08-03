@@ -13,8 +13,10 @@ With a `component-name` (function) and `something` (data) registered in Ripple, 
 
 ```js
 ripple('something').on('change', function(){
+
   all('[data=something]')
     .map(ripple.draw)
+    
 })
 ```
 
