@@ -46,7 +46,7 @@ function draw(ripple) {
 function everything(ripple) {
   var selector = values(ripple.resources).filter(header("content-type", "application/javascript")).map(key("name")).join(",");
 
-  return all(selector).map(invoke(ripple));
+  return !selector ? [] : all(selector).map(invoke(ripple));
 }
 
 // render all elements that depend on the resource
@@ -311,11 +311,14 @@ module.exports = function first(d){
   return d[0]
 }
 },{}],12:[function(require,module,exports){
+var is = require('utilise/is')  
+
 module.exports = function flatten(p,v){ 
+  is.arr(v) && (v = v.reduce(flatten, []))
   return (p = p || []), p.concat(v) 
 }
 
-},{}],13:[function(require,module,exports){
+},{"utilise/is":18}],13:[function(require,module,exports){
 var datum = require('utilise/datum')
   , key = require('utilise/key')
 
@@ -447,7 +450,7 @@ module.exports = function key(k, v){
          : is.arr(k) ? (k.map(copy), masked)
          : o[k] || !keys.length ? (set ? ((o[k] = is.fn(v) ? v(o[k]) : v), o)
                                        :   o[k])
-                                : (set ? key(keys.join('.'), v)(o[root] ? o[root] : (o[root] = {}))
+                                : (set ? (key(keys.join('.'), v)(o[root] ? o[root] : (o[root] = {})), o)
                                        : key(keys.join('.'))(o[root]))
 
     function copy(d){
@@ -533,11 +536,27 @@ module.exports = function str(d){
 }
 },{"utilise/is":18}],30:[function(require,module,exports){
 module.exports = { 
-  arr : toArray
+  arr: toArray
+, obj: toObject
 }
 
 function toArray(d){
   return Array.prototype.slice.call(d, 0)
+}
+
+function toObject(d) {
+  var by = 'id'
+    , o = {}
+
+  return arguments.length == 1 
+    ? (by = d, reduce)
+    : reduce.apply(this, arguments)
+
+  function reduce(p,v,i){
+    if (i === 0) p = {}
+    p[v[by]] = v
+    return p
+  }
 }
 },{}],31:[function(require,module,exports){
 var keys = require('utilise/keys')

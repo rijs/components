@@ -49,8 +49,9 @@ function everything(ripple){
         .map(key('name'))
         .join(',')
 
-  return all(selector)
-    .map(invoke(ripple))
+  return !selector ? [] 
+       : all(selector)
+           .map(invoke(ripple))
 }
 
 // render all elements that depend on the resource

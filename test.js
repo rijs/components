@@ -229,4 +229,11 @@ describe('Custom Elements', function(){
     
   })
 
+  it('should not fail if no elements via force redraw', function(){
+    var original = ripple.resources
+    ripple.resources = {}
+    expect(ripple.draw()).to.be.eql([])
+    ripple.resources = original
+  })
+
 })

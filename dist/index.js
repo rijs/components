@@ -45,7 +45,7 @@ function draw(ripple) {
 function everything(ripple) {
   var selector = values(ripple.resources).filter(header("content-type", "application/javascript")).map(key("name")).join(",");
 
-  return all(selector).map(invoke(ripple));
+  return !selector ? [] : all(selector).map(invoke(ripple));
 }
 
 // render all elements that depend on the resource
