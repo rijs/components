@@ -236,4 +236,8 @@ describe('Custom Elements', function(){
     ripple.resources = original
   })
 
+  it('should emitterify custom elements by default', function(){
+    expect(el1.on).to.be.ok
+  })
+
 })

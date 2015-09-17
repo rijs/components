@@ -78,7 +78,8 @@ function invoke(ripple){
     if (el.nodeName == '#text') return invoke(ripple)(el.parentNode)
     if (!el.matches(isAttached)) return;
     if (attr(el, 'inert') != null) return;
-    return ripple.render.apply(this, arguments)
+    if (!el.on) emitterify(el)
+    return ripple.render(el)
   }
 }
 
@@ -147,6 +148,7 @@ function isCustomElement(d) {
   return ~d.nodeName.indexOf('-')
 }
 
+import emitterify from 'utilise/emitterify'
 import resourcify from 'utilise/resourcify'
 import includes from 'utilise/includes'
 import identity from 'utilise/identity'

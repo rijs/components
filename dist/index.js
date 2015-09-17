@@ -74,7 +74,8 @@ function invoke(ripple) {
     if (el.nodeName == "#text") return invoke(ripple)(el.parentNode);
     if (!el.matches(isAttached)) return;
     if (attr(el, "inert") != null) return;
-    return ripple.render.apply(this, arguments);
+    if (!el.on) emitterify(el);
+    return ripple.render(el);
   };
 }
 
@@ -131,6 +132,8 @@ function onlyIfDifferent(m) {
 function isCustomElement(d) {
   return ~d.nodeName.indexOf("-");
 }
+
+var emitterify = _interopRequire(require("utilise/emitterify"));
 
 var resourcify = _interopRequire(require("utilise/resourcify"));
 
