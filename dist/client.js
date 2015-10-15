@@ -31,7 +31,6 @@ function components(ripple) {
   ripple.draw = draw(ripple);
   ripple.render = render(ripple);
   ripple.on("change", raf(ripple));
-  // ready(ripple.draw)
   return ripple;
 }
 
@@ -44,9 +43,7 @@ function draw(ripple) {
 
 // render all components
 function everything(ripple) {
-  var selector = values(ripple.resources).filter(header("content-type", "application/javascript")).map(key("name"))
-  // .concat([':unresolved'].filter(wrap(customs)))
-  .join(",");
+  var selector = values(ripple.resources).filter(header("content-type", "application/javascript")).map(key("name")).join(",");
 
   return !selector ? [] : all(selector).map(invoke(ripple));
 }
@@ -131,23 +128,19 @@ function onlyIfDifferent(m) {
   return attr(m.target, m.attributeName) != m.oldValue;
 }
 
-function isCustomElement(d) {
-  return ~d.nodeName.indexOf("-");
-}
-
 function ready(fn) {
   return document.body ? fn() : document.addEventListener("DOMContentLoaded", fn);
 }
 
 function drawAttrs(ripple) {
   return function (mutations) {
-    return mutations.filter(key("attributeName")).filter(by("target", isCustomElement)).filter(onlyIfDifferent).map(ripple.draw);
+    return mutations.filter(key("attributeName")).filter(by("target.nodeName", includes("-"))).filter(onlyIfDifferent).map(ripple.draw);
   };
 }
 
 function drawNodes(ripple) {
   return function (mutations) {
-    return mutations.map(key("addedNodes")).map(to.arr).reduce(flatten).filter(isCustomElement).map(ripple.draw);
+    return mutations.map(key("addedNodes")).map(to.arr).reduce(flatten).filter(by("nodeName", includes("-"))).map(ripple.draw);
   };
 }
 
@@ -232,7 +225,7 @@ module.exports = fn;
 
 function fn(ripple) {
   return function (res) {
-    if (!customEls || registered(res)) return all("" + res.name + ":not([inert])\n                 ,[is=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
+    if (!customs || registered(res)) return all("" + res.name + ":not([inert])\n                 ,[is=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
 
     var proto = Object.create(HTMLElement.prototype),
         opts = { prototype: proto },
@@ -250,19 +243,13 @@ function registered(res) {
   return extend ? document.createElement(extend, res.name).attachedCallback : document.createElement(res.name).attachedCallback;
 }
 
-function node(ripple) {
-  return function () {
-    ripple.invoke(this);
-  };
-}
-
 var header = _interopRequire(require("utilise/header"));
 
 var client = _interopRequire(require("utilise/client"));
 
 var all = _interopRequire(require("utilise/all"));
 
-var customEls = client && !!document.registerElement;
+var customs = client && !!document.registerElement;
 },{"utilise/all":4,"utilise/client":8,"utilise/header":17}],4:[function(require,module,exports){
 var to = require('utilise/to')
 

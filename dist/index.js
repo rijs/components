@@ -30,7 +30,6 @@ function components(ripple) {
   ripple.draw = draw(ripple);
   ripple.render = render(ripple);
   ripple.on("change", raf(ripple));
-  // ready(ripple.draw)
   return ripple;
 }
 
@@ -43,9 +42,7 @@ function draw(ripple) {
 
 // render all components
 function everything(ripple) {
-  var selector = values(ripple.resources).filter(header("content-type", "application/javascript")).map(key("name"))
-  // .concat([':unresolved'].filter(wrap(customs)))
-  .join(",");
+  var selector = values(ripple.resources).filter(header("content-type", "application/javascript")).map(key("name")).join(",");
 
   return !selector ? [] : all(selector).map(invoke(ripple));
 }
@@ -130,23 +127,19 @@ function onlyIfDifferent(m) {
   return attr(m.target, m.attributeName) != m.oldValue;
 }
 
-function isCustomElement(d) {
-  return ~d.nodeName.indexOf("-");
-}
-
 function ready(fn) {
   return document.body ? fn() : document.addEventListener("DOMContentLoaded", fn);
 }
 
 function drawAttrs(ripple) {
   return function (mutations) {
-    return mutations.filter(key("attributeName")).filter(by("target", isCustomElement)).filter(onlyIfDifferent).map(ripple.draw);
+    return mutations.filter(key("attributeName")).filter(by("target.nodeName", includes("-"))).filter(onlyIfDifferent).map(ripple.draw);
   };
 }
 
 function drawNodes(ripple) {
   return function (mutations) {
-    return mutations.map(key("addedNodes")).map(to.arr).reduce(flatten).filter(isCustomElement).map(ripple.draw);
+    return mutations.map(key("addedNodes")).map(to.arr).reduce(flatten).filter(by("nodeName", includes("-"))).map(ripple.draw);
   };
 }
 

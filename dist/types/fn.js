@@ -8,7 +8,7 @@ module.exports = fn;
 
 function fn(ripple) {
   return function (res) {
-    if (!customEls || registered(res)) return all("" + res.name + ":not([inert])\n                 ,[is=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
+    if (!customs || registered(res)) return all("" + res.name + ":not([inert])\n                 ,[is=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
 
     var proto = Object.create(HTMLElement.prototype),
         opts = { prototype: proto },
@@ -26,16 +26,10 @@ function registered(res) {
   return extend ? document.createElement(extend, res.name).attachedCallback : document.createElement(res.name).attachedCallback;
 }
 
-function node(ripple) {
-  return function () {
-    ripple.invoke(this);
-  };
-}
-
 var header = _interopRequire(require("utilise/header"));
 
 var client = _interopRequire(require("utilise/client"));
 
 var all = _interopRequire(require("utilise/all"));
 
-var customEls = client && !!document.registerElement;
+var customs = client && !!document.registerElement;
