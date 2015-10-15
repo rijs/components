@@ -1,7 +1,7 @@
 // register custom element prototype (render is automatic)
 export default function fn(ripple) {
   return res => {
-    if (!customEls || registered(res)) 
+    if (!customs || registered(res)) 
       return all(`${res.name}:not([inert])
                  ,[is="${res.name}"]:not([inert])`)
               .map(ripple.draw)  
@@ -25,11 +25,7 @@ function registered(res) {
                 : document.createElement(res.name).attachedCallback
 }
 
-function node(ripple) {
-  return function(){ ripple.invoke(this) }
-}
-
 import header from 'utilise/header'
 import client from 'utilise/client'
 import all from 'utilise/all'
-var customEls = client && !!document.registerElement
+var customs = client && !!document.registerElement

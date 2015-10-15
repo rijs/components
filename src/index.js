@@ -13,10 +13,7 @@ export default function components(ripple){
   if (!client) return ripple;
   log('creating')
   
-  if (!customEls) document.body 
-    ? polyfill(ripple)()
-    : document.addEventListener('DOMContentLoaded', polyfill(ripple))
-
+  if (!customs) ready(polyfill(ripple))
   values(ripple.types).map(type => type.parse = proxy(type.parse || identity, clean(ripple)))
   key('types.application/javascript.render', wrap(fn(ripple)))(ripple)
   key('types.application/data.render', wrap(data(ripple)))(ripple)
@@ -89,7 +86,7 @@ function render(ripple){
       , deps = attr(el, 'data')
       , fn   = body(ripple)(name)
       , data = resourcify(ripple)(deps)
-  
+      
     try {
           fn
       && (!deps || data)
@@ -102,7 +99,7 @@ function render(ripple){
   }
 }
 
-// for non-Chrome..
+// polyfill
 function polyfill(ripple) {
   return function(){
     if (typeof MutationObserver == 'undefined') return
@@ -114,21 +111,10 @@ function polyfill(ripple) {
   }
 }
 
-// polyfills
 function drawCustomEls(ripple) {
   return function(mutations){
-    mutations
-      .filter(key('attributeName'))
-      .filter(by('target', isCustomElement))
-      .filter(onlyIfDifferent)
-      .map(ripple.draw)
-
-    mutations
-      .map(key('addedNodes'))
-      .map(to.arr)
-      .reduce(flatten)
-      .filter(isCustomElement)
-      .map(ripple.draw)
+    drawNodes(ripple)(mutations)
+    drawAttrs(ripple)(mutations)
   }
 }
 
@@ -140,12 +126,30 @@ function clean(ripple){
   }
 }
 
+// helpers
 function onlyIfDifferent(m) {
   return attr(m.target, m.attributeName) != m.oldValue
 }
 
-function isCustomElement(d) {
-  return ~d.nodeName.indexOf('-')
+function ready(fn){
+  return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn)
+}
+
+function drawAttrs(ripple) {
+  return mutations => mutations
+    .filter(key('attributeName'))
+    .filter(by('target.nodeName', includes('-')))
+    .filter(onlyIfDifferent)
+    .map(ripple.draw)
+}
+
+function drawNodes(ripple) {
+  return mutations => mutations
+    .map(key('addedNodes'))
+    .map(to.arr)
+    .reduce(flatten)
+    .filter(by('nodeName', includes('-')))
+    .map(ripple.draw)
 }
 
 import emitterify from 'utilise/emitterify'
@@ -175,8 +179,8 @@ import fn from './types/fn'
 log = log('[ri/components]')
 err = err('[ri/components]')
 var mutation = client && window.MutationRecord || noop
-  , customEls = client && !!document.registerElement
-  , isAttached = customEls
+  , customs = client && !!document.registerElement
+  , isAttached = customs
                   ? 'html *, :host-context(html) *'
                   : 'html *'
 client && (Element.prototype.matches = Element.prototype.matches || Element.prototype.msMatchesSelector)

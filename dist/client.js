@@ -22,8 +22,7 @@ function components(ripple) {
     return ripple;
   }log("creating");
 
-  if (!customEls) document.body ? polyfill(ripple)() : document.addEventListener("DOMContentLoaded", polyfill(ripple));
-
+  if (!customs) ready(polyfill(ripple));
   values(ripple.types).map(function (type) {
     return type.parse = proxy(type.parse || identity, clean(ripple));
   });
@@ -32,6 +31,7 @@ function components(ripple) {
   ripple.draw = draw(ripple);
   ripple.render = render(ripple);
   ripple.on("change", raf(ripple));
+  // ready(ripple.draw)
   return ripple;
 }
 
@@ -44,7 +44,9 @@ function draw(ripple) {
 
 // render all components
 function everything(ripple) {
-  var selector = values(ripple.resources).filter(header("content-type", "application/javascript")).map(key("name")).join(",");
+  var selector = values(ripple.resources).filter(header("content-type", "application/javascript")).map(key("name"))
+  // .concat([':unresolved'].filter(wrap(customs)))
+  .join(",");
 
   return !selector ? [] : all(selector).map(invoke(ripple));
 }
@@ -97,7 +99,7 @@ function render(ripple) {
   };
 }
 
-// for non-Chrome..
+// polyfill
 function polyfill(ripple) {
   return function () {
     if (typeof MutationObserver == "undefined") return;
@@ -109,12 +111,10 @@ function polyfill(ripple) {
   };
 }
 
-// polyfills
 function drawCustomEls(ripple) {
   return function (mutations) {
-    mutations.filter(key("attributeName")).filter(by("target", isCustomElement)).filter(onlyIfDifferent).map(ripple.draw);
-
-    mutations.map(key("addedNodes")).map(to.arr).reduce(flatten).filter(isCustomElement).map(ripple.draw);
+    drawNodes(ripple)(mutations);
+    drawAttrs(ripple)(mutations);
   };
 }
 
@@ -126,12 +126,29 @@ function clean(ripple) {
   };
 }
 
+// helpers
 function onlyIfDifferent(m) {
   return attr(m.target, m.attributeName) != m.oldValue;
 }
 
 function isCustomElement(d) {
   return ~d.nodeName.indexOf("-");
+}
+
+function ready(fn) {
+  return document.body ? fn() : document.addEventListener("DOMContentLoaded", fn);
+}
+
+function drawAttrs(ripple) {
+  return function (mutations) {
+    return mutations.filter(key("attributeName")).filter(by("target", isCustomElement)).filter(onlyIfDifferent).map(ripple.draw);
+  };
+}
+
+function drawNodes(ripple) {
+  return function (mutations) {
+    return mutations.map(key("addedNodes")).map(to.arr).reduce(flatten).filter(isCustomElement).map(ripple.draw);
+  };
 }
 
 var emitterify = _interopRequire(require("utilise/emitterify"));
@@ -185,8 +202,8 @@ var fn = _interopRequire(require("./types/fn"));
 log = log("[ri/components]");
 err = err("[ri/components]");
 var mutation = client && window.MutationRecord || noop,
-    customEls = client && !!document.registerElement,
-    isAttached = customEls ? "html *, :host-context(html) *" : "html *";
+    customs = client && !!document.registerElement,
+    isAttached = customs ? "html *, :host-context(html) *" : "html *";
 client && (Element.prototype.matches = Element.prototype.matches || Element.prototype.msMatchesSelector);
 },{"./types/data":2,"./types/fn":3,"utilise/all":4,"utilise/attr":5,"utilise/body":6,"utilise/by":7,"utilise/client":8,"utilise/emitterify":11,"utilise/err":12,"utilise/flatten":14,"utilise/header":17,"utilise/identity":18,"utilise/includes":19,"utilise/is":20,"utilise/key":21,"utilise/lo":23,"utilise/log":24,"utilise/noop":25,"utilise/prepend":28,"utilise/proxy":29,"utilise/resourcify":30,"utilise/to":33,"utilise/values":34,"utilise/wrap":35}],2:[function(require,module,exports){
 "use strict";
@@ -572,7 +589,7 @@ var is = require('utilise/is')
 module.exports = function proxy(fn, ret, ctx){ 
   return function(){
     var result = fn.apply(ctx || this, arguments)
-    return is.fn(ret) ? ret(result) : ret || result
+    return is.fn(ret) ? ret.call(ctx || this, result) : ret || result
   }
 }
 },{"utilise/is":20}],30:[function(require,module,exports){
