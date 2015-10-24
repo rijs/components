@@ -23,8 +23,7 @@ describe('Custom Elements', function(){
 
     el1 = container.children[0]
     el2 = container.children[1]
-    el3 = container.children[2]
-    
+    el3 = container.children[2]    
     setTimeout(done, 30)
   })
 
@@ -238,6 +237,23 @@ describe('Custom Elements', function(){
 
   it('should emitterify custom elements by default', function(){
     expect(el1.on).to.be.ok
+  })
+
+  it('should save draw shortcut once', function(){  
+    var count = 0
+      , fn1
+      , fn2
+
+    fn1 = el.draw
+
+    ripple('component-1', function(){ count++ })
+    el1.draw()
+    el1.draw()
+    
+    fn2 = el.draw
+
+    expect(fn1).to.be.equal(fn2)
+    expect(count).to.equal(2)
   })
 
 })

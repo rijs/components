@@ -75,6 +75,9 @@ function invoke(ripple) {
     if (!el.matches(isAttached)) return;
     if (attr(el, "inert") != null) return;
     if (!el.on) emitterify(el);
+    if (!el.draw) el.draw = function (d) {
+      return ripple.draw(el);
+    };
     return ripple.render(el);
   };
 }
