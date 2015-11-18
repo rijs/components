@@ -1,15 +1,19 @@
-"use strict";
+'use strict';
 
-/* istanbul ignore next */
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = data;
+
+var _all = require('utilise/all');
+
+var _all2 = _interopRequireDefault(_all);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // render all elements that require the specified data
-module.exports = data;
-
 function data(ripple) {
   return function (res) {
-    return all("[data~=\"" + res.name + "\"]:not([inert])").map(ripple.draw);
+    return (0, _all2.default)('[data~="' + res.name + '"]:not([inert])').map(ripple.draw);
   };
 }
-
-var all = _interopRequire(require("utilise/all"));

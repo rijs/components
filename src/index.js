@@ -168,18 +168,16 @@ import body from 'utilise/body'
 import noop from 'utilise/noop'
 import wrap from 'utilise/wrap'
 import key from 'utilise/key'
-import err from 'utilise/err'
 import all from 'utilise/all'
-import log from 'utilise/log'
 import is from 'utilise/is'
 import by from 'utilise/by'
 import lo from 'utilise/lo'
 import to from 'utilise/to'
 import data from './types/data'
 import fn from './types/fn'
-log = log('[ri/components]')
-err = err('[ri/components]')
-var mutation = client && window.MutationRecord || noop
+var log = require('utilise/log')('[ri/components]')
+  , err = require('utilise/err')('[ri/components]')
+  , mutation = client && window.MutationRecord || noop
   , customs = client && !!document.registerElement
   , isAttached = customs
                   ? 'html *, :host-context(html) *'

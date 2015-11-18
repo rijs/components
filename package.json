@@ -3,31 +3,34 @@
   "version": "0.0.5",
   "main": "dist",
   "author": "Pedram Emrouznejad (https://github.com/pemrouz)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rijs/components.git"
+  },
   "scripts": {
     "ignore": "find ./dist -type f -exec sed -i \"s/var _interopRequire/\\/* istanbul ignore next *\\/\\nvar _interopRequire/g\" {} ';'",
     "babel": "babel src -d dist",
-    "bundle": "browserify dist/index.js -o dist/client.js",
     "clean": "rm -rf dist && mkdir dist",
-    "minify": "uglifyjs dist/client.js -m -c drop_console,dead_code -d debug=false -o dist/client.min.js",
-    "build": "npm run clean && npm run babel && npm run ignore && npm run bundle && npm run minify",
+    "build": "npm run clean && npm run babel && npm run ignore",
     "test": "popper",
     "version": "npm run build && git add -A",
     "postversion": "git push && git push --tags"
   },
   "license": "pemrouz.mit-license.org",
   "devDependencies": {
-    "babel": "^4.6.3",
-    "browserify": "^9.0.3",
-    "chai": "^2.3.0",
+    "babel-cli": "*",
+    "babel-preset-es2015": "*",
+    "browserify": "*",
+    "chai": "*",
+    "popper": "*",
+    "coveralls": "*",
+    "istanbul": "*",
+    "mocha": "*",
+    "mocha-lcov-reporter": "*",
+    "uglify-js": "*",
     "rijs.core": "*",
     "rijs.data": "*",
-    "rijs.fn": "*",
-    "popper": "*",
-    "coveralls": "^2.11.2",
-    "istanbul": "^0.3.13",
-    "mocha": "^2.2.4",
-    "mocha-lcov-reporter": "0.0.2",
-    "uglify-js": "^2.4.16"
+    "rijs.fn": "*"
   },
   "dependencies": {
     "utilise": "*"
