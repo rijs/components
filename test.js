@@ -2,10 +2,10 @@ var expect = require('chai').expect
   , values = require('utilise/values')
   , attr = require('utilise/attr')
   , key = require('utilise/key')
-  , components = require('./')
-  , core = require('rijs.core')
-  , data = require('rijs.data')
-  , fn = require('rijs.fn')
+  , components = require('./').default
+  , core = require('rijs.core').default
+  , data = require('rijs.data').default
+  , fn = require('rijs.fn').default
   , container = document.createElement('div')
   , el1, el2, el3
   , ripple = components(fn(data(core())))
