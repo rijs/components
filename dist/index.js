@@ -142,15 +142,24 @@ function resource(ripple) {
     var res = ripple.resources[name],
         type = (0, _header2.default)('content-type')(res);
 
-    return (ripple.types[type].render || _noop2.default)(res);
+    return (ripple.types[type].render || _noop2.default)(res); // TODO identity
   };
 }
 
 // batch renders on render frames
 function raf(ripple) {
   return function (res) {
-    return !(0, _header2.default)('pending')(res) && (res.headers.pending = requestAnimationFrame(function () {
+    return !(0, _header2.default)('pending')(res) && (res.headers.pending = requestAnimationFrame(function (d) {
       return delete ripple.resources[res.name].headers.pending, ripple.draw(res);
+    }));
+  };
+}
+
+// batch renders on render frames
+function batch(ripple) {
+  return function (el) {
+    return !el.pending && (el.pending = requestAnimationFrame(function (d) {
+      return delete el.pending, ripple.render(el);
     }));
   };
 }
@@ -166,7 +175,7 @@ function invoke(ripple) {
     if (!el.draw) el.draw = function (d) {
       return ripple.draw(el);
     };
-    return ripple.render(el);
+    return batch(ripple)(el), el;
   };
 }
 

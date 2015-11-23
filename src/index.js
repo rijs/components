@@ -10,7 +10,7 @@
 // MutationObserver(ripple.draw) - redraws element being observed
 
 export default function components(ripple){
-  if (!client) return ripple;
+  if (!client) return ripple
   log('creating')
   
   if (!customs) ready(polyfill(ripple))
@@ -64,8 +64,14 @@ function resource(ripple){
 // batch renders on render frames
 function raf(ripple){
   return res => !header('pending')(res) 
-      && (res.headers.pending = requestAnimationFrame(() => 
+      && (res.headers.pending = requestAnimationFrame(d => 
           (delete ripple.resources[res.name].headers.pending, ripple.draw(res))))
+}
+
+// batch renders on render frames
+function batch(ripple){
+  return el => !el.pending 
+     && (el.pending = requestAnimationFrame(d => (delete el.pending, ripple.render(el))))
 }
 
 // main function to render a particular custom element with any data it needs
@@ -73,11 +79,11 @@ function invoke(ripple){
   return function(el) {
     if (el.nodeName == '#document-fragment') return invoke(ripple)(el.host)
     if (el.nodeName == '#text') return invoke(ripple)(el.parentNode)
-    if (!el.matches(isAttached)) return;
-    if (attr(el, 'inert') != null) return;
+    if (!el.matches(isAttached)) return
+    if (attr(el, 'inert') != null) return
     if (!el.on) emitterify(el)
     if (!el.draw) el.draw = d => ripple.draw(el)
-    return ripple.render(el)
+    return batch(ripple)(el), el
   }
 }
 
@@ -121,7 +127,7 @@ function drawCustomEls(ripple) {
 
 // clean local headers for transport
 function clean(ripple){
-  return function(res){
+  return res => {
     delete res.headers.pending
     return res
   }
