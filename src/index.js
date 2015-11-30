@@ -92,12 +92,13 @@ function render(ripple){
     var name = attr(el, 'is') || el.tagName.toLowerCase()
       , deps = attr(el, 'data')
       , fn   = body(ripple)(name)
-      , data = resourcify(ripple)(deps)
+      , data = bodies(ripple)(deps)
+
+    if (!fn) return el
+    if (deps && !data) return el
       
     try {
-          fn
-      && (!deps || data)
-      && fn.call(el.shadowRoot || el, data)
+      fn.call(el.shadowRoot || el, defaults(el, data))
     } catch (e) {
       err(e, e.stack)
     }
@@ -134,6 +135,12 @@ function clean(ripple){
 }
 
 // helpers
+function defaults(el, data) {
+  if (is.lit(el.__data__)) data = extend(data || {})(el.__data__)
+  el.state = extend(data || {})(el.state || {})
+  return el.state
+}
+
 function onlyIfDifferent(m) {
   return attr(m.target, m.attributeName) != m.oldValue
 }
@@ -159,8 +166,20 @@ function drawNodes(ripple) {
     .map(ripple.draw)
 }
 
+function bodies(ripple){
+  return deps => {
+    var o = {}
+      , names = deps ? deps.split(' ') : []
+
+    names.map(d => o[d] = body(ripple)(d))
+
+    return !names.length            ? undefined
+         : values(o).some(is.falsy) ? undefined 
+         : o
+  }
+}
+
 import emitterify from 'utilise/emitterify'
-import resourcify from 'utilise/resourcify'
 import includes from 'utilise/includes'
 import identity from 'utilise/identity'
 import flatten from 'utilise/flatten'

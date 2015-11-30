@@ -1,6 +1,7 @@
 var expect = require('chai').expect
   , values = require('utilise/values')
   , attr = require('utilise/attr')
+  , time = require('utilise/time')
   , key = require('utilise/key')
   , components = require('./').default
   , core = require('rijs.core').default
@@ -24,7 +25,7 @@ describe('Custom Elements', function(){
     el1 = container.children[0]
     el2 = container.children[1]
     el3 = container.children[2]    
-    setTimeout(done, 30)
+    time(30, done)
   })
 
   after(function(){
@@ -33,9 +34,10 @@ describe('Custom Elements', function(){
 
   it('should decorate core with draw api', function(){  
     expect(typeof ripple.draw).to.equal('function')
+    expect(typeof ripple.render).to.equal('function')
   })
 
-  it('should draw a single node', function(){  
+  it('should draw a single node', function(done){  
     var result1, result2
 
     ripple('array', [])
@@ -44,11 +46,15 @@ describe('Custom Elements', function(){
 
     expect(ripple.draw(el1)).to.equal(el1)
     expect(ripple.draw.call(el2)).to.equal(el2)
-    expect(result1).to.equal(el1)
-    expect(result2).to.equal(el2)
+
+    time(20, function() {
+      expect(result1).to.equal(el1)
+      expect(result2).to.equal(el2)
+      done()
+    })
   })
 
-  it('should draw a d3 node', function(){  
+  it('should draw a d3 node', function(done){  
     var fn1 = function(){ return el1 }
       , fn2 = function(){ return el2 }
       , d31 = { node: fn1 }
@@ -61,21 +67,29 @@ describe('Custom Elements', function(){
 
     expect(ripple.draw(d31)).to.equal(el1)
     expect(ripple.draw.call(d32)).to.equal(el2)
-    expect(result1).to.equal(el1)
-    expect(result2).to.equal(el2)
+
+    time(20, function() {
+      expect(result1).to.equal(el1)
+      expect(result2).to.equal(el2)
+      done()
+    })
   })
 
-  it('should draw a resource with single datum', function(){
+  it('should draw a resource with single datum', function(done){
     var result
 
     ripple('array', [1, 2, 3])
     ripple('component-2', function(d){ result = d })
 
     ripple.draw(el2)
-    expect(result).to.eql([1, 2, 3])
+
+    time(20, function(){
+      expect(result).to.eql({ array: [1, 2, 3] })
+      done()
+    })
   })
 
-  it('should draw a resource with multiple data', function(){
+  it('should draw a resource with multiple data', function(done){
     var result
 
     ripple('array', [1, 2, 3])
@@ -83,10 +97,60 @@ describe('Custom Elements', function(){
     ripple('component-3', function(d){ result = d })
 
     ripple.draw(el3)
-    expect(result).to.eql({ array: [1, 2, 3], object: { foo: 'bar' }})
+
+    time(20, function(){
+      expect(result).to.eql({ array: [1, 2, 3], object: { foo: 'bar' }})
+      done()
+    })
   })
 
-  it('should draw a resource by name (data)', function(){
+  it('should draw a resource with d3 datum', function(done){
+    var result
+
+    ripple('component-1', function(d){ result = d })
+
+    el1.__data__ = { foo: 'bar' }
+    ripple.draw(el1)
+
+    time(20, function(){
+      expect(result).to.eql({ foo: 'bar' })
+      done()
+    })
+  })
+
+  it('should draw a resource with local state', function(done){
+    var result
+
+    ripple('component-1', function(d){ result = d })
+
+    el1.state = { focused: true }
+    ripple.draw(el1)
+
+    time(20, function(){
+      expect(result).to.eql({ focused: true })
+      done()
+    })
+  })
+
+
+  it('should draw a resource with combined data', function(done){
+    var result
+
+    el2.__data__ = { foo: 'bar' }
+    el2.state = { focused: true }
+    ripple('array', [1, 2, 3])
+    ripple('component-2', function(d){ result = d })
+
+    ripple.draw(el2)
+
+    time(20, function(){
+      expect(result).to.eql({ focused: true, foo: 'bar', array: [1, 2, 3] })
+      expect(el2.state == result).to.be.ok
+      done()
+    })
+  })
+
+  it('should draw a resource by name (data)', function(done){
     var result2, result3
 
     ripple('array', [1, 2, 3])
@@ -95,26 +159,31 @@ describe('Custom Elements', function(){
     ripple('component-3', function(d){ result3 = this })
 
     ripple.draw('array')
-    expect(result2).to.be.ok
-
     ripple.draw('object')
-    expect(result3).to.be.ok
+
+    time(20, function() {
+      expect(result2).to.be.ok
+      expect(result3).to.be.ok
+      done()
+    })
   })
 
-  it('should draw a resource by name (js)', function(){
+  it('should draw a resource by name (js)', function(done){
     var result
-
     ripple('component-1', function(d){ result = this })
-
     ripple.draw('component-1')
-    expect(result).to.be.ok
+
+    time(20, function() {
+      expect(result).to.be.ok
+      done()
+    })
   })
 
   it('should redraw element via MutationObserver', function(done){  
     if (typeof MutationObserver == 'undefined') return done()
-    setTimeout(function(){ el1.innerHTML = 'foo' }, 50)
-    setTimeout(function(){ expect(result).to.be.ok }, 100)
-    setTimeout(done, 150)
+    time(50 , function(){ el1.innerHTML = 'foo' })
+    time(100, function(){ expect(result).to.be.ok })
+    time(150, done)
 
     var muto = new MutationObserver(ripple.draw)
       , conf = { characterData: true, subtree: true, childList: true }
@@ -124,7 +193,7 @@ describe('Custom Elements', function(){
     muto.observe(el1, conf)
   })
 
-  it('should draw everything', function(){  
+  it('should draw everything', function(done){  
     var result1, result2, result3
 
     ripple('array')
@@ -134,26 +203,37 @@ describe('Custom Elements', function(){
     ripple('component-3', function(){ result3 = this })
 
     expect(ripple.draw()).to.eql([el1, el2, el3])
-    expect(result1).to.equal(el1)
-    expect(result2).to.equal(el2)
-    expect(result3).to.equal(el3)
+
+    time(20, function() {
+      expect(result1).to.equal(el1)
+      expect(result2).to.equal(el2)
+      expect(result3).to.equal(el3)
+      done()
+    })
   })
 
-  it('should not draw headless fragments', function(){  
+  it('should not draw headless fragments', function(done){  
+    container.innerHTML = ''
     var frag = document.createElement('component-1')
       , result
                 
     ripple('component-1', function(){ result = this })
     result = null
     ripple.draw(frag)
-    expect(result).to.not.be.ok
 
-    container.appendChild(frag)
-    ripple.draw(frag)
-    expect(result).to.be.ok
+    time(20, function() {
+      expect(result).to.not.be.ok
+      container.appendChild(frag)
+      ripple.draw(frag)
+
+      time(20, function() {
+        expect(result).to.be.ok
+        done()
+      })
+    })
   })
 
-  it('should not draw inert elements', function(){  
+  it('should not draw inert elements', function(done){  
     var result
 
     ripple('component-1', function(){ result = this })
@@ -161,11 +241,18 @@ describe('Custom Elements', function(){
 
     attr(el1, 'inert', '')
     ripple.draw(el1)
-    expect(result).to.not.be.ok
+    time(20, function(){ 
+      expect(result).to.not.be.ok 
 
-    attr(el1, 'inert', false)
-    ripple.draw(el1)
-    expect(result).to.be.ok
+      attr(el1, 'inert', false)
+      ripple.draw(el1)
+
+      time(20, function() {
+        expect(result).to.be.ok
+        done()
+      })
+    })
+
   })
 
   it('should implicitly draw when all pieces available', function(done){  
@@ -175,11 +262,11 @@ describe('Custom Elements', function(){
     ripple('component-1', function(){ result1 = this })
     ripple('component-2', function(){ result2 = this })
     
-    setTimeout(function(){
+    time(20, function(){
       expect(result1).to.be.ok
       expect(result2).to.be.ok
       done()
-    }, 50)
+    })
   })
 
   it('should batch draws', function(done){  
@@ -192,23 +279,24 @@ describe('Custom Elements', function(){
     ripple('array').push(4)
     ripple('array').push(5)
     
-    setTimeout(function(){
+    time(40, function(){
       expect(count).to.equal(1)
       expect(ripple('array')).to.eql([1,2,3,1,2,3,4,5])
       done()
-    }, 50)
+    })
   })
 
   it('should redraw on attribute changes', function(done){
     ripple('component-1', function(){ this.innerHTML = attr(this, 'foo') })
 
-    setTimeout(function(){
+    time(20, function(){
       attr(el1, 'foo', 'bar')
-    }, 50)
-    setTimeout(function(){
+    })
+
+    time(40, function(){
       expect(el1.innerHTML).to.equal('bar')
       done()
-    }, 100)
+    })
   })
 
   it('should draw newly attached elements', function(done){
@@ -217,14 +305,15 @@ describe('Custom Elements', function(){
     ripple('component-1', function(){ count++ })
     expect(count).to.equal(0)
 
-    setTimeout(function(){
+    time(40, function(){
       expect(count).to.equal(1)
       container.appendChild(document.createElement('component-1'))
-    }, 50)
-    setTimeout(function(){
+    })
+
+    time(80, function(){
       expect(count).to.equal(2)
       done()
-    }, 100)
+    })
     
   })
 
@@ -239,7 +328,7 @@ describe('Custom Elements', function(){
     expect(el1.on).to.be.ok
   })
 
-  it('should save draw shortcut once', function(){  
+  it('should save draw shortcut once', function(done){  
     var count = 0
       , fn1
       , fn2
@@ -248,12 +337,18 @@ describe('Custom Elements', function(){
 
     ripple('component-1', function(){ count++ })
     el1.draw()
-    el1.draw()
     
-    fn2 = el.draw
+    time(40, function() {
+      el1.draw()
+      time(80, function() {
+        fn2 = el.draw
+        expect(fn1).to.be.equal(fn2)
+        expect(count).to.equal(2)
+        done()
+      })
+    })
+    
 
-    expect(fn1).to.be.equal(fn2)
-    expect(count).to.equal(2)
   })
 
 })

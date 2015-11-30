@@ -9,10 +9,6 @@ var _emitterify = require('utilise/emitterify');
 
 var _emitterify2 = _interopRequireDefault(_emitterify);
 
-var _resourcify = require('utilise/resourcify');
-
-var _resourcify2 = _interopRequireDefault(_resourcify);
-
 var _includes = require('utilise/includes');
 
 var _includes2 = _interopRequireDefault(_includes);
@@ -142,7 +138,7 @@ function resource(ripple) {
     var res = ripple.resources[name],
         type = (0, _header2.default)('content-type')(res);
 
-    return (ripple.types[type].render || _noop2.default)(res); // TODO identity
+    return (ripple.types[type].render || _noop2.default)(res);
   };
 }
 
@@ -184,10 +180,13 @@ function render(ripple) {
     var name = (0, _attr2.default)(el, 'is') || el.tagName.toLowerCase(),
         deps = (0, _attr2.default)(el, 'data'),
         fn = (0, _body2.default)(ripple)(name),
-        data = (0, _resourcify2.default)(ripple)(deps);
+        data = bodies(ripple)(deps);
+
+    if (!fn) return el;
+    if (deps && !data) return el;
 
     try {
-      fn && (!deps || data) && fn.call(el.shadowRoot || el, data);
+      fn.call(el.shadowRoot || el, defaults(el, data));
     } catch (e) {
       err(e, e.stack);
     }
@@ -224,6 +223,12 @@ function clean(ripple) {
 }
 
 // helpers
+function defaults(el, data) {
+  if (_is2.default.lit(el.__data__)) data = extend(data || {})(el.__data__);
+  el.state = extend(data || {})(el.state || {});
+  return el.state;
+}
+
 function onlyIfDifferent(m) {
   return (0, _attr2.default)(m.target, m.attributeName) != m.oldValue;
 }
@@ -241,6 +246,19 @@ function drawAttrs(ripple) {
 function drawNodes(ripple) {
   return function (mutations) {
     return mutations.map((0, _key2.default)('addedNodes')).map(_to2.default.arr).reduce(_flatten2.default).filter((0, _by2.default)('nodeName', (0, _includes2.default)('-'))).map(ripple.draw);
+  };
+}
+
+function bodies(ripple) {
+  return function (deps) {
+    var o = {},
+        names = deps ? deps.split(' ') : [];
+
+    names.map(function (d) {
+      return o[d] = (0, _body2.default)(ripple)(d);
+    });
+
+    return !names.length ? undefined : (0, _values2.default)(o).some(_is2.default.falsy) ? undefined : o;
   };
 }
 

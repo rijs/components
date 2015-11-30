@@ -6,7 +6,6 @@ tests: (npm run build > /dev/null) && browserify ./test.js
   -i colors
   -i chai
   | sed -E "s/require\('chai'\)/window.chai/"
-  | uglifyjs
 
 watch: 
   - src
