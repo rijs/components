@@ -262,7 +262,7 @@ describe('Custom Elements', function(){
     ripple('component-1', function(){ result1 = this })
     ripple('component-2', function(){ result2 = this })
     
-    time(20, function(){
+    time(40, function(){
       expect(result1).to.be.ok
       expect(result2).to.be.ok
       done()
@@ -347,7 +347,21 @@ describe('Custom Elements', function(){
         done()
       })
     })
-    
+  })
+
+  it('should not attempt to register non-custom elements', function(done){  
+    var called
+      , original = document.registerElement
+
+    document.registerElement = function(){ called = true }
+
+    ripple('function', function(){ })
+
+    time(40, function(){
+      expect(called).to.not.be.ok
+      document.registerElement = original
+      done()
+    })
 
   })
 

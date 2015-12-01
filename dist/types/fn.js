@@ -5,6 +5,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = fn;
 
+var _includes = require('utilise/includes');
+
+var _includes2 = _interopRequireDefault(_includes);
+
 var _header = require('utilise/header');
 
 var _header2 = _interopRequireDefault(_header);
@@ -22,7 +26,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // register custom element prototype (render is automatic)
 function fn(ripple) {
   return function (res) {
-    if (!customs || registered(res)) return (0, _all2.default)(res.name + ':not([inert])\n                 ,[is="' + res.name + '"]:not([inert])').map(ripple.draw);
+    if (!customs || !customEl(res) || registered(res)) return (0, _all2.default)(res.name + ':not([inert])\n                 ,[is="' + res.name + '"]:not([inert])').map(ripple.draw);
 
     var proto = Object.create(HTMLElement.prototype),
         opts = { prototype: proto },
@@ -40,4 +44,7 @@ function registered(res) {
   return extend ? document.createElement(extend, res.name).attachedCallback : document.createElement(res.name).attachedCallback;
 }
 
-var customs = _client2.default && !!document.registerElement;
+var customs = _client2.default && !!document.registerElement,
+    customEl = function customEl(d) {
+  return (0, _includes2.default)('-')(d.name);
+};
