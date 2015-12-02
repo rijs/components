@@ -364,4 +364,23 @@ describe('Custom Elements', function(){
 
   })
 
+  it('should always extend existing state', function(done){  
+    var results = []
+
+    ripple('array', [1])
+    ripple('component-2', function(){ results.push(this.state) })
+    ripple.draw()
+
+    time(20, function() {
+      ripple('array', [2])
+
+      time(20, function() {
+        results.forEach(function(d){
+          expect(d).to.equal(results[0])
+        })
+        done()
+      })
+    })
+  })
+
 })

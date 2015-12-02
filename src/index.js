@@ -129,9 +129,14 @@ function clean(ripple){
 
 // helpers
 function defaults(el, data) {
-  if (is.lit(el.__data__)) data = extend(data || {})(el.__data__)
-  el.state = extend(data || {})(el.state || {})
+  el.state = el.state || {}
+  overwrite(el.state)(data)
+  overwrite(el.state)(el.__data__)
   return el.state
+}
+
+function overwrite(to) {
+  return from => keys(from).map(copy(from, to))
 }
 
 function onlyIfDifferent(m) {
@@ -185,6 +190,7 @@ import attr from 'utilise/attr'
 import body from 'utilise/body'
 import noop from 'utilise/noop'
 import wrap from 'utilise/wrap'
+import copy from 'utilise/copy'
 import key from 'utilise/key'
 import all from 'utilise/all'
 import is from 'utilise/is'

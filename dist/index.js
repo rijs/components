@@ -57,6 +57,10 @@ var _wrap = require('utilise/wrap');
 
 var _wrap2 = _interopRequireDefault(_wrap);
 
+var _copy = require('utilise/copy');
+
+var _copy2 = _interopRequireDefault(_copy);
+
 var _key = require('utilise/key');
 
 var _key2 = _interopRequireDefault(_key);
@@ -215,9 +219,16 @@ function clean(ripple) {
 
 // helpers
 function defaults(el, data) {
-  if (_is2.default.lit(el.__data__)) data = extend(data || {})(el.__data__);
-  el.state = extend(data || {})(el.state || {});
+  el.state = el.state || {};
+  overwrite(el.state)(data);
+  overwrite(el.state)(el.__data__);
   return el.state;
+}
+
+function overwrite(to) {
+  return function (from) {
+    return keys(from).map((0, _copy2.default)(from, to));
+  };
 }
 
 function onlyIfDifferent(m) {
