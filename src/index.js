@@ -19,7 +19,7 @@ export default function components(ripple){
   key('types.application/data.render', wrap(data(ripple)))(ripple)
   ripple.draw = draw(ripple)
   ripple.render = render(ripple)
-  ripple.on('change', raf(ripple))
+  ripple.on('change', ripple.draw)
   return ripple
 }
 
@@ -59,13 +59,6 @@ function resource(ripple){
 
     return (ripple.types[type].render || noop)(res)
   }
-}
-
-// batch renders on render frames
-function raf(ripple){
-  return res => !header('pending')(res) 
-      && (res.headers.pending = requestAnimationFrame(d => 
-          (delete ripple.resources[res.name].headers.pending, ripple.draw(res))))
 }
 
 // batch renders on render frames

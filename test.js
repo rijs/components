@@ -236,10 +236,9 @@ describe('Custom Elements', function(){
   it('should not draw inert elements', function(done){  
     var result
 
-    ripple('component-1', function(){ result = this })
-    result = null
-
     attr(el1, 'inert', '')
+    ripple('component-1', function(){ result = this })
+    
     ripple.draw(el1)
     time(20, function(){ 
       expect(result).to.not.be.ok 

@@ -114,7 +114,7 @@ function components(ripple) {
   (0, _key2.default)('types.application/data.render', (0, _wrap2.default)((0, _data2.default)(ripple)))(ripple);
   ripple.draw = draw(ripple);
   ripple.render = render(ripple);
-  ripple.on('change', raf(ripple));
+  ripple.on('change', ripple.draw);
   return ripple;
 }
 
@@ -139,15 +139,6 @@ function resource(ripple) {
         type = (0, _header2.default)('content-type')(res);
 
     return (ripple.types[type].render || _noop2.default)(res);
-  };
-}
-
-// batch renders on render frames
-function raf(ripple) {
-  return function (res) {
-    return !(0, _header2.default)('pending')(res) && (res.headers.pending = requestAnimationFrame(function (d) {
-      return delete ripple.resources[res.name].headers.pending, ripple.draw(res);
-    }));
   };
 }
 
