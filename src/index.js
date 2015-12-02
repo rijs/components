@@ -82,7 +82,7 @@ function invoke(ripple){
 
 function render(ripple){
   return function(el){
-    var name = attr(el, 'is') || el.tagName.toLowerCase()
+    var name = lo(el.tagName)
       , deps = attr(el, 'data')
       , fn   = body(ripple)(name)
       , data = bodies(ripple)(deps)

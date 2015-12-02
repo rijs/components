@@ -168,7 +168,7 @@ function invoke(ripple) {
 
 function render(ripple) {
   return function (el) {
-    var name = (0, _attr2.default)(el, 'is') || el.tagName.toLowerCase(),
+    var name = (0, _lo2.default)(el.tagName),
         deps = (0, _attr2.default)(el, 'data'),
         fn = (0, _body2.default)(ripple)(name),
         data = bodies(ripple)(deps);
