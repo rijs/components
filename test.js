@@ -285,19 +285,6 @@ describe('Custom Elements', function(){
     })
   })
 
-  it('should redraw on attribute changes', function(done){
-    ripple('component-1', function(){ this.innerHTML = attr(this, 'foo') })
-
-    time(20, function(){
-      attr(el1, 'foo', 'bar')
-    })
-
-    time(40, function(){
-      expect(el1.innerHTML).to.equal('bar')
-      done()
-    })
-  })
-
   it('should draw newly attached elements', function(done){
     var count = 0
 

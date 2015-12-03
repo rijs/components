@@ -11,9 +11,7 @@ export default function fn(ripple) {
       , extend = res.headers['extends']
 
     extend && (opts.extends = extend)
-    proto.attachedCallback = 
-    proto.attributeChangedCallback =
-      ripple.draw
+    proto.attachedCallback = ripple.draw
     document.registerElement(res.name, opts)
   }
 }
