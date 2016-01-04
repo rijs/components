@@ -10,7 +10,7 @@ var expect = require('chai').expect
   , container = document.createElement('div')
   , el1, el2, el3
   , ripple = components(fn(data(core())))
-  
+
 describe('Custom Elements', function(){
 
   before(function(){
@@ -25,6 +25,7 @@ describe('Custom Elements', function(){
     el1 = container.children[0]
     el2 = container.children[1]
     el3 = container.children[2]    
+
     time(30, done)
   })
 
@@ -319,7 +320,7 @@ describe('Custom Elements', function(){
       , fn1
       , fn2
 
-    fn1 = el.draw
+    fn1 = el1.draw
 
     ripple('component-1', function(){ count++ })
     el1.draw()
@@ -327,7 +328,7 @@ describe('Custom Elements', function(){
     time(40, function() {
       el1.draw()
       time(80, function() {
-        fn2 = el.draw
+        fn2 = el1.draw
         expect(fn1).to.be.equal(fn2)
         expect(count).to.equal(2)
         done()
@@ -368,6 +369,24 @@ describe('Custom Elements', function(){
         done()
       })
     })
+  })
+
+  it('should reset __data__', function(done){  
+    el1.__data__ = { foo: 1 }
+    ripple('component-1', function(){ var s = this.state; time(50, function(){ s.bar = 2 }) })
+    ripple.draw()
+
+    time(20, function() {
+      expect(el1.__data__).to.equal(el1.state)
+      expect(el1.__data__).to.eql({ foo: 1 })
+    })
+
+    time(80, function() {
+      expect(el1.__data__).to.equal(el1.state)
+      expect(el1.__data__).to.eql({ foo: 1, bar: 2 })
+    })
+    
+    time(100, done)
   })
 
 })

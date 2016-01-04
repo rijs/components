@@ -132,6 +132,7 @@ function defaults(el, data) {
   el.state = el.state || {}
   overwrite(el.state)(data)
   overwrite(el.state)(el.__data__)
+  el.__data__ = el.state
   return el.state
 }
 
