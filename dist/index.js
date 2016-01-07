@@ -196,16 +196,9 @@ function polyfill(ripple) {
     if (typeof MutationObserver == 'undefined') return;
     if (document.body.muto) document.body.muto.disconnect();
     var muto = document.body.muto = new MutationObserver(drawCustomEls(ripple)),
-        conf = { childList: true, subtree: true, attributes: true, attributeOldValue: true };
+        conf = { childList: true, subtree: true };
 
     muto.observe(document.body, conf);
-  };
-}
-
-function drawCustomEls(ripple) {
-  return function (mutations) {
-    drawNodes(ripple)(mutations);
-    drawAttrs(ripple)(mutations);
   };
 }
 
@@ -240,13 +233,7 @@ function ready(fn) {
   return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn);
 }
 
-function drawAttrs(ripple) {
-  return function (mutations) {
-    return mutations.filter((0, _key2.default)('attributeName')).filter((0, _by2.default)('target.nodeName', (0, _includes2.default)('-'))).filter(onlyIfDifferent).map(ripple.draw);
-  };
-}
-
-function drawNodes(ripple) {
+function drawCustomEls(ripple) {
   return function (mutations) {
     return mutations.map((0, _key2.default)('addedNodes')).map(_to2.default.arr).reduce(_flatten2.default).filter((0, _by2.default)('nodeName', (0, _includes2.default)('-'))).map(ripple.draw);
   };

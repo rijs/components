@@ -389,4 +389,22 @@ describe('Custom Elements', function(){
     time(100, done)
   })
 
+  it('should not redraw on attr change', function(done){  
+    var result
+    ripple('component-1', function(){ result = true })
+    ripple.draw(el1)
+    
+    time(40, function(){ 
+      result = false
+      attr(el1, 'foo', 'bar')
+    })
+
+    time(80, function() {
+      expect(result).to.not.be.ok
+      done()
+    })
+
+  })
+
+
 })
