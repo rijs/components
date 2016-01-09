@@ -235,7 +235,7 @@ function onlyIfDifferent(m) {
 
 function drawCustomEls(ripple) {
   return function (mutations) {
-    return mutations.map((0, _key2.default)('addedNodes')).map(_to2.default.arr).reduce(_flatten2.default).filter((0, _by2.default)('nodeName', (0, _includes2.default)('-'))).map(ripple.draw);
+    return mutations.map((0, _key2.default)('addedNodes')).map(_to2.default.arr).reduce(_flatten2.default).filter((0, _by2.default)('nodeName', (0, _includes2.default)('-'))).map(ripple.draw) | 0;
   };
 }
 

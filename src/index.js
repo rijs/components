@@ -143,7 +143,7 @@ function drawCustomEls(ripple) {
     .map(to.arr)
     .reduce(flatten)
     .filter(by('nodeName', includes('-')))
-    .map(ripple.draw)
+    .map(ripple.draw) | 0
 }
 
 function bodies(ripple){
