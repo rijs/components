@@ -21,10 +21,6 @@ var _flatten = require('utilise/flatten');
 
 var _flatten2 = _interopRequireDefault(_flatten);
 
-var _prepend = require('utilise/prepend');
-
-var _prepend2 = _interopRequireDefault(_prepend);
-
 var _header = require('utilise/header');
 
 var _header2 = _interopRequireDefault(_header);
@@ -40,6 +36,10 @@ var _values2 = _interopRequireDefault(_values);
 var _proxy = require('utilise/proxy');
 
 var _proxy2 = _interopRequireDefault(_proxy);
+
+var _ready = require('utilise/ready');
+
+var _ready2 = _interopRequireDefault(_ready);
 
 var _attr = require('utilise/attr');
 
@@ -60,6 +60,10 @@ var _wrap2 = _interopRequireDefault(_wrap);
 var _copy = require('utilise/copy');
 
 var _copy2 = _interopRequireDefault(_copy);
+
+var _keys = require('utilise/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
 
 var _key = require('utilise/key');
 
@@ -110,9 +114,9 @@ function components(ripple) {
   if (!_client2.default) return ripple;
   log('creating');
 
-  if (!customs) ready(polyfill(ripple));
+  if (!customs) (0, _ready2.default)(polyfill(ripple));
   (0, _values2.default)(ripple.types).map(function (type) {
-    return type.parse = (0, _proxy2.default)(type.parse || _identity2.default, clean(ripple));
+    return type.parse = (0, _proxy2.default)(type.parse, clean(ripple));
   });
   (0, _key2.default)('types.application/javascript.render', (0, _wrap2.default)((0, _fn2.default)(ripple)))(ripple);
   (0, _key2.default)('types.application/data.render', (0, _wrap2.default)((0, _data2.default)(ripple)))(ripple);
@@ -192,7 +196,7 @@ function render(ripple) {
 
 // polyfill
 function polyfill(ripple) {
-  return function () {
+  return function (d) {
     if (typeof MutationObserver == 'undefined') return;
     if (document.body.muto) document.body.muto.disconnect();
     var muto = document.body.muto = new MutationObserver(drawCustomEls(ripple)),
@@ -221,16 +225,12 @@ function defaults(el, data) {
 
 function overwrite(to) {
   return function (from) {
-    return keys(from).map((0, _copy2.default)(from, to));
+    return (0, _keys2.default)(from).map((0, _copy2.default)(from, to));
   };
 }
 
 function onlyIfDifferent(m) {
   return (0, _attr2.default)(m.target, m.attributeName) != m.oldValue;
-}
-
-function ready(fn) {
-  return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn);
 }
 
 function drawCustomEls(ripple) {

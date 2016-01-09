@@ -14,7 +14,7 @@ export default function components(ripple){
   log('creating')
   
   if (!customs) ready(polyfill(ripple))
-  values(ripple.types).map(type => type.parse = proxy(type.parse || identity, clean(ripple)))
+  values(ripple.types).map(type => type.parse = proxy(type.parse, clean(ripple)))
   key('types.application/javascript.render', wrap(fn(ripple)))(ripple)
   key('types.application/data.render', wrap(data(ripple)))(ripple)
   ripple.draw = draw(ripple)
@@ -102,7 +102,7 @@ function render(ripple){
 
 // polyfill
 function polyfill(ripple) {
-  return function(){
+  return d => {
     if (typeof MutationObserver == 'undefined') return
     if (document.body.muto) document.body.muto.disconnect()
     const muto = document.body.muto = new MutationObserver(drawCustomEls(ripple))
@@ -137,10 +137,6 @@ function onlyIfDifferent(m) {
   return attr(m.target, m.attributeName) != m.oldValue
 }
 
-function ready(fn){
-  return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn)
-}
-
 function drawCustomEls(ripple) {
   return mutations => mutations
     .map(key('addedNodes'))
@@ -167,16 +163,17 @@ import emitterify from 'utilise/emitterify'
 import includes from 'utilise/includes'
 import identity from 'utilise/identity'
 import flatten from 'utilise/flatten'
-import prepend from 'utilise/prepend'
 import header from 'utilise/header'
 import client from 'utilise/client'
 import values from 'utilise/values'
 import proxy from 'utilise/proxy'
+import ready from 'utilise/ready'
 import attr from 'utilise/attr'
 import body from 'utilise/body'
 import noop from 'utilise/noop'
 import wrap from 'utilise/wrap'
 import copy from 'utilise/copy'
+import keys from 'utilise/keys'
 import key from 'utilise/key'
 import all from 'utilise/all'
 import is from 'utilise/is'
@@ -185,11 +182,11 @@ import lo from 'utilise/lo'
 import to from 'utilise/to'
 import data from './types/data'
 import fn from './types/fn'
-var log = require('utilise/log')('[ri/components]')
-  , err = require('utilise/err')('[ri/components]')
-  , mutation = client && window.MutationRecord || noop
-  , customs = client && !!document.registerElement
-  , isAttached = customs
+const log = require('utilise/log')('[ri/components]')
+    , err = require('utilise/err')('[ri/components]')
+    , mutation = client && window.MutationRecord || noop
+    , customs = client && !!document.registerElement
+    , isAttached = customs
                   ? 'html *, :host-context(html) *'
                   : 'html *'
 client && (Element.prototype.matches = Element.prototype.matches || Element.prototype.msMatchesSelector)
