@@ -225,7 +225,7 @@ function defaults(el, data) {
 
 function overwrite(to) {
   return function (from) {
-    return (0, _keys2.default)(from).map((0, _copy2.default)(from, to));
+    return _is2.default.obj(from) && (0, _keys2.default)(from).map((0, _copy2.default)(from, to));
   };
 }
 

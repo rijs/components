@@ -130,7 +130,7 @@ function defaults(el, data) {
 }
 
 function overwrite(to) {
-  return from => keys(from).map(copy(from, to))
+  return from => is.obj(from) && keys(from).map(copy(from, to))
 }
 
 function onlyIfDifferent(m) {
