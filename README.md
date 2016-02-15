@@ -20,7 +20,7 @@ ripple('something').on('change', function(){
 })
 ```
 
-Browsers natively supporting Custom Elements will have them upgraded automatically, modern browsers will reactively update using MutationObservers and older browsers will use polling. You can also manually invoke renders:
+All instances of Custom Elements will be upgraded automatically. You can also manually invoke renders:
 
 ```js
 ripple.draw(<el> | resource object | resource name)
