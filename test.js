@@ -2,6 +2,7 @@ var expect = require('chai').expect
   , values = require('utilise/values')
   , attr = require('utilise/attr')
   , time = require('utilise/time')
+  , push = require('utilise/push')
   , key = require('utilise/key')
   , components = require('./').default
   , core = require('rijs.core').default
@@ -273,11 +274,11 @@ describe('Custom Elements', function(){
     var count = 0
 
     ripple('component-2', function(){ count++ })
-    ripple('array').push(1)
-    ripple('array').push(2)
-    ripple('array').push(3)
-    ripple('array').push(4)
-    ripple('array').push(5)
+    push(1)(ripple('array'))
+    push(2)(ripple('array'))
+    push(3)(ripple('array'))
+    push(4)(ripple('array'))
+    push(5)(ripple('array'))
     
     time(40, function(){
       expect(count).to.equal(1)
