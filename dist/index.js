@@ -9,13 +9,13 @@ var _emitterify = require('utilise/emitterify');
 
 var _emitterify2 = _interopRequireDefault(_emitterify);
 
+var _overwrite = require('utilise/overwrite');
+
+var _overwrite2 = _interopRequireDefault(_overwrite);
+
 var _includes = require('utilise/includes');
 
 var _includes2 = _interopRequireDefault(_includes);
-
-var _identity = require('utilise/identity');
-
-var _identity2 = _interopRequireDefault(_identity);
 
 var _flatten = require('utilise/flatten');
 
@@ -52,18 +52,6 @@ var _body2 = _interopRequireDefault(_body);
 var _noop = require('utilise/noop');
 
 var _noop2 = _interopRequireDefault(_noop);
-
-var _wrap = require('utilise/wrap');
-
-var _wrap2 = _interopRequireDefault(_wrap);
-
-var _copy = require('utilise/copy');
-
-var _copy2 = _interopRequireDefault(_copy);
-
-var _keys = require('utilise/keys');
-
-var _keys2 = _interopRequireDefault(_keys);
 
 var _key = require('utilise/key');
 
@@ -118,11 +106,15 @@ function components(ripple) {
   (0, _values2.default)(ripple.types).map(function (type) {
     return type.parse = (0, _proxy2.default)(type.parse, clean(ripple));
   });
-  (0, _key2.default)('types.application/javascript.render', (0, _wrap2.default)((0, _fn2.default)(ripple)))(ripple);
-  (0, _key2.default)('types.application/data.render', (0, _wrap2.default)((0, _data2.default)(ripple)))(ripple);
+  (0, _key2.default)('types.application/javascript.render', function (d) {
+    return (0, _fn2.default)(ripple);
+  })(ripple);
+  (0, _key2.default)('types.application/data.render', function (d) {
+    return (0, _data2.default)(ripple);
+  })(ripple);
   ripple.draw = draw(ripple);
   ripple.render = render(ripple);
-  ripple.on('change', ripple.draw);
+  ripple.on('change.draw', ripple.draw);
   return ripple;
 }
 
@@ -134,33 +126,33 @@ function draw(ripple) {
 }
 
 // render all components
-function everything(ripple) {
+var everything = function everything(ripple) {
   var selector = (0, _values2.default)(ripple.resources).filter((0, _header2.default)('content-type', 'application/javascript')).map((0, _key2.default)('name')).join(',');
 
   return !selector ? [] : (0, _all2.default)(selector).map(invoke(ripple));
-}
+};
 
 // render all elements that depend on the resource
-function resource(ripple) {
+var resource = function resource(ripple) {
   return function (name) {
     var res = ripple.resources[name],
         type = (0, _header2.default)('content-type')(res);
 
     return (ripple.types[type].render || _noop2.default)(res);
   };
-}
+};
 
 // batch renders on render frames
-function batch(ripple) {
+var batch = function batch(ripple) {
   return function (el) {
     return !el.pending && (el.pending = requestAnimationFrame(function (d) {
       return delete el.pending, ripple.render(el);
     }));
   };
-}
+};
 
 // main function to render a particular custom element with any data it needs
-function invoke(ripple) {
+var invoke = function invoke(ripple) {
   return function (el) {
     if (el.nodeName == '#document-fragment') return invoke(ripple)(el.host);
     if (el.nodeName == '#text') return invoke(ripple)(el.parentNode);
@@ -172,9 +164,9 @@ function invoke(ripple) {
     };
     return batch(ripple)(el), el;
   };
-}
+};
 
-function render(ripple) {
+var render = function render(ripple) {
   return function (el) {
     var name = (0, _lo2.default)(el.tagName),
         deps = (0, _attr2.default)(el, 'data'),
@@ -185,17 +177,17 @@ function render(ripple) {
     if (deps && !data) return el;
 
     try {
-      fn.call(el.shadowRoot || el, defaults(el, data));
+      fn.call(el.shadowRoot || el, defaults(el, data), index(el));
     } catch (e) {
       err(e, e.stack);
     }
 
     return el;
   };
-}
+};
 
 // polyfill
-function polyfill(ripple) {
+var polyfill = function polyfill(ripple) {
   return function (d) {
     if (typeof MutationObserver == 'undefined') return;
     if (document.body.muto) document.body.muto.disconnect();
@@ -204,42 +196,35 @@ function polyfill(ripple) {
 
     muto.observe(document.body, conf);
   };
-}
+};
 
 // clean local headers for transport
-function clean(ripple) {
+var clean = function clean(ripple) {
   return function (res) {
-    delete res.headers.pending;
-    return res;
+    return delete res.headers.pending, res;
   };
-}
+};
 
 // helpers
-function defaults(el, data) {
+var defaults = function defaults(el, data) {
   el.state = el.state || {};
-  overwrite(el.state)(data);
-  overwrite(el.state)(el.__data__);
+  (0, _overwrite2.default)(el.state)(data);
+  (0, _overwrite2.default)(el.state)(el.__data__);
   el.__data__ = el.state;
   return el.state;
-}
+};
 
-function overwrite(to) {
-  return function (from) {
-    return _is2.default.obj(from) && (0, _keys2.default)(from).map((0, _copy2.default)(from, to));
-  };
-}
-
-function onlyIfDifferent(m) {
+var onlyIfDifferent = function onlyIfDifferent(m) {
   return (0, _attr2.default)(m.target, m.attributeName) != m.oldValue;
-}
+};
 
-function drawCustomEls(ripple) {
+var drawCustomEls = function drawCustomEls(ripple) {
   return function (mutations) {
     return mutations.map((0, _key2.default)('addedNodes')).map(_to2.default.arr).reduce(_flatten2.default).filter((0, _by2.default)('nodeName', (0, _includes2.default)('-'))).map(ripple.draw) | 0;
   };
-}
+};
 
-function bodies(ripple) {
+var bodies = function bodies(ripple) {
   return function (deps) {
     var o = {},
         names = deps ? deps.split(' ') : [];
@@ -250,7 +235,11 @@ function bodies(ripple) {
 
     return !names.length ? undefined : (0, _values2.default)(o).some(_is2.default.falsy) ? undefined : o;
   };
-}
+};
+
+var index = function index(el) {
+  return Array.prototype.indexOf.call((0, _key2.default)('parentNode.children')(el) || [], el);
+};
 
 var log = require('utilise/log')('[ri/components]'),
     err = require('utilise/err')('[ri/components]'),

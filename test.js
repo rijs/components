@@ -403,8 +403,17 @@ describe('Custom Elements', function(){
       expect(result).to.not.be.ok
       done()
     })
-
   })
 
+  it('should pass index as implicit data', function(done){
+    var result
+    ripple('component-1', function(d, i){ result = i })
+    ripple.draw(el1)
+    
+    time(40, function(){ 
+      expect(result).to.be.eql(0)
+      done()
+    })
+  })
 
 })
