@@ -5,10 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = components;
 
-var _emitterify = require('utilise/emitterify');
-
-var _emitterify2 = _interopRequireDefault(_emitterify);
-
 var _overwrite = require('utilise/overwrite');
 
 var _overwrite2 = _interopRequireDefault(_overwrite);
@@ -16,10 +12,6 @@ var _overwrite2 = _interopRequireDefault(_overwrite);
 var _includes = require('utilise/includes');
 
 var _includes2 = _interopRequireDefault(_includes);
-
-var _flatten = require('utilise/flatten');
-
-var _flatten2 = _interopRequireDefault(_flatten);
 
 var _header = require('utilise/header');
 
@@ -37,10 +29,6 @@ var _proxy = require('utilise/proxy');
 
 var _proxy2 = _interopRequireDefault(_proxy);
 
-var _ready = require('utilise/ready');
-
-var _ready2 = _interopRequireDefault(_ready);
-
 var _attr = require('utilise/attr');
 
 var _attr2 = _interopRequireDefault(_attr);
@@ -52,6 +40,10 @@ var _body2 = _interopRequireDefault(_body);
 var _noop = require('utilise/noop');
 
 var _noop2 = _interopRequireDefault(_noop);
+
+var _time = require('utilise/time');
+
+var _time2 = _interopRequireDefault(_time);
 
 var _key = require('utilise/key');
 
@@ -65,17 +57,9 @@ var _is = require('utilise/is');
 
 var _is2 = _interopRequireDefault(_is);
 
-var _by = require('utilise/by');
-
-var _by2 = _interopRequireDefault(_by);
-
 var _lo = require('utilise/lo');
 
 var _lo2 = _interopRequireDefault(_lo);
-
-var _to = require('utilise/to');
-
-var _to2 = _interopRequireDefault(_to);
 
 var _data = require('./types/data');
 
@@ -102,7 +86,6 @@ function components(ripple) {
   if (!_client2.default) return ripple;
   log('creating');
 
-  if (!customs) (0, _ready2.default)(polyfill(ripple));
   (0, _values2.default)(ripple.types).map(function (type) {
     return type.parse = (0, _proxy2.default)(type.parse, clean(ripple));
   });
@@ -112,9 +95,10 @@ function components(ripple) {
   (0, _key2.default)('types.application/data.render', function (d) {
     return (0, _data2.default)(ripple);
   })(ripple);
-  ripple.draw = draw(ripple);
+  ripple.draw = Node.prototype.draw = draw(ripple);
   ripple.render = render(ripple);
   ripple.on('change.draw', ripple.draw);
+  (0, _time2.default)(0, ripple.draw);
   return ripple;
 }
 
@@ -154,14 +138,11 @@ var batch = function batch(ripple) {
 // main function to render a particular custom element with any data it needs
 var invoke = function invoke(ripple) {
   return function (el) {
+    if (!(0, _includes2.default)('-')(el.nodeName)) return;
     if (el.nodeName == '#document-fragment') return invoke(ripple)(el.host);
     if (el.nodeName == '#text') return invoke(ripple)(el.parentNode);
     if (!el.matches(isAttached)) return;
     if ((0, _attr2.default)(el, 'inert') != null) return;
-    if (!el.on) (0, _emitterify2.default)(el);
-    if (!el.draw) el.draw = function (d) {
-      return ripple.draw(el);
-    };
     return batch(ripple)(el), el;
   };
 };
@@ -186,18 +167,6 @@ var render = function render(ripple) {
   };
 };
 
-// polyfill
-var polyfill = function polyfill(ripple) {
-  return function (d) {
-    if (typeof MutationObserver == 'undefined') return;
-    if (document.body.muto) document.body.muto.disconnect();
-    var muto = document.body.muto = new MutationObserver(drawCustomEls(ripple)),
-        conf = { childList: true, subtree: true };
-
-    muto.observe(document.body, conf);
-  };
-};
-
 // clean local headers for transport
 var clean = function clean(ripple) {
   return function (res) {
@@ -212,16 +181,6 @@ var defaults = function defaults(el, data) {
   (0, _overwrite2.default)(el.state)(el.__data__);
   el.__data__ = el.state;
   return el.state;
-};
-
-var onlyIfDifferent = function onlyIfDifferent(m) {
-  return (0, _attr2.default)(m.target, m.attributeName) != m.oldValue;
-};
-
-var drawCustomEls = function drawCustomEls(ripple) {
-  return function (mutations) {
-    return mutations.map((0, _key2.default)('addedNodes')).map(_to2.default.arr).reduce(_flatten2.default).filter((0, _by2.default)('nodeName', (0, _includes2.default)('-'))).map(ripple.draw) | 0;
-  };
 };
 
 var bodies = function bodies(ripple) {

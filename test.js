@@ -17,21 +17,21 @@ describe('Custom Elements', function(){
   after( function(){ document.body.removeChild(container) })
   
   beforeEach(function(){ 
-    delete HTMLElement.prototype.draw
+    delete Node.prototype.draw
     container.innerHTML = ''
   })
 
   it('should decorate core with draw api', function(){
-    var ripple = window.x = components(fn(data(core())))
+    var ripple = components(fn(data(core())))
     expect(typeof ripple.draw).to.equal('function')
     expect(typeof ripple.render).to.equal('function')
-    expect(document.head.draw).to.equal(ripple.draw)
+    expect(typeof document.head.draw).to.equal('function')
   })
 
   it('should draw a single node', function(done){  
     var el1 = once(container)('component-1', 1).node()
       , el2 = once(container)('component-2', 1).node()
-      , ripple = window.r = components(fn(data(core())))
+      , ripple = components(fn(data(core())))
       , result1, result2
     
     ripple('component-1', function(){ result1 = this })

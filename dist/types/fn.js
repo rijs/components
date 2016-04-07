@@ -9,10 +9,6 @@ var _includes = require('utilise/includes');
 
 var _includes2 = _interopRequireDefault(_includes);
 
-var _header = require('utilise/header');
-
-var _header2 = _interopRequireDefault(_header);
-
 var _client = require('utilise/client');
 
 var _client2 = _interopRequireDefault(_client);
@@ -29,20 +25,16 @@ function fn(ripple) {
     if (!customs || !customEl(res) || registered(res)) return (0, _all2.default)(res.name + ':not([inert])\n                 ,[is="' + res.name + '"]:not([inert])').map(ripple.draw);
 
     var proto = Object.create(HTMLElement.prototype),
-        opts = { prototype: proto },
-        extend = res.headers['extends'];
+        opts = { prototype: proto };
 
-    extend && (opts.extends = extend);
     proto.attachedCallback = ripple.draw;
     document.registerElement(res.name, opts);
   };
 }
 
-function registered(res) {
-  var extend = (0, _header2.default)('extends')(res);
-
-  return extend ? document.createElement(extend, res.name).attachedCallback : document.createElement(res.name).attachedCallback;
-}
+var registered = function registered(res) {
+  return document.createElement(res.name).attachedCallback;
+};
 
 var customs = _client2.default && !!document.registerElement,
     customEl = function customEl(d) {

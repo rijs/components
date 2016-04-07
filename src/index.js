@@ -13,13 +13,13 @@ export default function components(ripple){
   if (!client) return ripple
   log('creating')
   
-  if (!customs) ready(polyfill(ripple))
   values(ripple.types).map(type => type.parse = proxy(type.parse, clean(ripple)))
   key('types.application/javascript.render', d => fn(ripple))(ripple)
   key('types.application/data.render', d => data(ripple))(ripple)
-  ripple.draw = draw(ripple)
+  ripple.draw = Node.prototype.draw = draw(ripple)
   ripple.render = render(ripple)
   ripple.on('change.draw', ripple.draw)
+  time(0, ripple.draw)
   return ripple
 }
 
@@ -52,11 +52,11 @@ const everything = ripple => {
 }
 
 // render all elements that depend on the resource
-const resource = ripple => name => {
+const resource = ripple => name => { 
   const res = ripple.resources[name]
       , type = header('content-type')(res)
 
-  return (ripple.types[type].render || noop)(res)
+  return (ripple.types[type].render || noop)(res)  
 }
 
 // batch renders on render frames
@@ -64,13 +64,12 @@ const batch = ripple => el => !el.pending
   && (el.pending = requestAnimationFrame(d => (delete el.pending, ripple.render(el))))
 
 // main function to render a particular custom element with any data it needs
-const invoke = ripple => el => {
+const invoke = ripple => el => { 
+  if (!includes('-')(el.nodeName)) return
   if (el.nodeName == '#document-fragment') return invoke(ripple)(el.host)
   if (el.nodeName == '#text') return invoke(ripple)(el.parentNode)
   if (!el.matches(isAttached)) return
   if (attr(el, 'inert') != null) return
-  if (!el.on) emitterify(el)
-  if (!el.draw) el.draw = d => ripple.draw(el)
   return batch(ripple)(el), el
 }
 
@@ -82,7 +81,7 @@ const render = ripple => el => {
 
   if (!fn) return el
   if (deps && !data) return el
-    
+
   try {
     fn.call(el.shadowRoot || el, defaults(el, data), index(el))
   } catch (e) {
@@ -90,16 +89,6 @@ const render = ripple => el => {
   }
 
   return el
-}
-
-// polyfill
-const polyfill = ripple => d => {
-  if (typeof MutationObserver == 'undefined') return
-  if (document.body.muto) document.body.muto.disconnect()
-  const muto = document.body.muto = new MutationObserver(drawCustomEls(ripple))
-      , conf = { childList: true, subtree: true }
-
-  muto.observe(document.body, conf)
 }
 
 // clean local headers for transport
@@ -114,15 +103,6 @@ const defaults = (el, data) => {
   return el.state
 }
 
-const onlyIfDifferent = m => attr(m.target, m.attributeName) != m.oldValue
-
-const drawCustomEls = ripple => mutations => mutations
-  .map(key('addedNodes'))
-  .map(to.arr)
-  .reduce(flatten)
-  .filter(by('nodeName', includes('-')))
-  .map(ripple.draw) | 0
-
 const bodies = ripple => deps => {
   var o = {}
     , names = deps ? deps.split(' ') : []
@@ -136,24 +116,20 @@ const bodies = ripple => deps => {
 
 const index = el => Array.prototype.indexOf.call(key('parentNode.children')(el) || [], el)
 
-import emitterify from 'utilise/emitterify'
 import overwrite from 'utilise/overwrite'
 import includes from 'utilise/includes'
-import flatten from 'utilise/flatten'
 import header from 'utilise/header'
 import client from 'utilise/client'
 import values from 'utilise/values'
 import proxy from 'utilise/proxy'
-import ready from 'utilise/ready'
 import attr from 'utilise/attr'
 import body from 'utilise/body'
 import noop from 'utilise/noop'
+import time from 'utilise/time'
 import key from 'utilise/key'
 import all from 'utilise/all'
 import is from 'utilise/is'
-import by from 'utilise/by'
 import lo from 'utilise/lo'
-import to from 'utilise/to'
 import data from './types/data'
 import fn from './types/fn'
 const log = require('utilise/log')('[ri/components]')
