@@ -433,4 +433,27 @@ describe('Custom Elements', function(){
     })
   })
 
+  it('should make changes accessible', function(done){
+    var ripple = components(fn(data(core())))
+      , result
+
+    once(container)('component-28[data="foo"]', 1)
+    ripple('component-28', function(){ result = this.change })
+    ripple('foo', [{ bar: 5 }, { baz: 10 }])
+
+    time(50, function(){
+      result = null
+      update('bar', 15)(ripple('foo'))
+      update('baz', 25)(ripple('foo'))
+    })
+
+    time(100, function(){
+      expect(result).to.eql([
+        ['foo', { type: 'update', key: 'bar', value: 15, time: 1}]
+      , ['foo', { type: 'update', key: 'baz', value: 25, time: 2}]
+      ])
+      done()
+    })
+  })
+
 })

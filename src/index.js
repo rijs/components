@@ -60,8 +60,14 @@ const resource = ripple => name => {
 }
 
 // batch renders on render frames
-const batch = ripple => el => !el.pending 
-  && (el.pending = requestAnimationFrame(d => (delete el.pending, ripple.render(el))))
+const batch = ripple => el => el.pending
+  ? el.pending.push(ripple.change)
+  : (el.pending = [ripple.change]
+  , requestAnimationFrame(d => {
+      el.change = el.pending
+      delete el.pending
+      ripple.render(el)
+    }))
 
 // main function to render a particular custom element with any data it needs
 const invoke = ripple => el => { 
