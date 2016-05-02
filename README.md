@@ -2,8 +2,9 @@
 [![Coverage Status](https://coveralls.io/repos/rijs/components/badge.svg?branch=master&service=github)](https://coveralls.io/github/rijs/components?branch=master)
 [![Build Status](https://travis-ci.org/rijs/components.svg)](https://travis-ci.org/rijs/components)
 
+Redraws any custom elements on the page when any of it's dependencies change (either the component definition, data, or styles).
 
-Renders Web Components. Given the following markup on your page:
+Given the following markup on your page:
 
 ```html
 <component-name data="something">
@@ -27,3 +28,5 @@ ripple.draw(<el> | resource object | resource name)
 ```
 
 If the first parameter is a DOM element, it will rerender that. If it is a resource (name or object), it will rerender anything on your page that depends on that resource. 
+
+See the [Primer#Components](https://github.com/rijs/docs/blob/master/primer.md#3-components) for more info
