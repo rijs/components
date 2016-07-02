@@ -33,10 +33,6 @@ var _attr = require('utilise/attr');
 
 var _attr2 = _interopRequireDefault(_attr);
 
-var _body = require('utilise/body');
-
-var _body2 = _interopRequireDefault(_body);
-
 var _noop = require('utilise/noop');
 
 var _noop2 = _interopRequireDefault(_noop);
@@ -153,7 +149,7 @@ var render = function render(ripple) {
   return function (el) {
     var name = (0, _lo2.default)(el.tagName),
         deps = (0, _attr2.default)(el, 'data'),
-        fn = (0, _body2.default)(ripple)(name),
+        fn = body(ripple)(name),
         data = bodies(ripple)(deps);
 
     if (!fn) return el;
@@ -191,10 +187,16 @@ var bodies = function bodies(ripple) {
         names = deps ? deps.split(' ') : [];
 
     names.map(function (d) {
-      return o[d] = (0, _body2.default)(ripple)(d);
+      return o[d] = body(ripple)(d);
     });
 
     return !names.length ? undefined : (0, _values2.default)(o).some(_is2.default.falsy) ? undefined : o;
+  };
+};
+
+var body = function body(ripple) {
+  return function (name) {
+    return ripple.resources[name] && ripple.resources[name].body;
   };
 };
 

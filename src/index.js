@@ -120,6 +120,8 @@ const bodies = ripple => deps => {
        : o
 }
 
+const body = ripple => name => ripple.resources[name] && ripple.resources[name].body
+
 const index = el => Array.prototype.indexOf.call(key('parentNode.children')(el) || [], el)
 
 import overwrite from 'utilise/overwrite'
@@ -129,7 +131,6 @@ import client from 'utilise/client'
 import values from 'utilise/values'
 import proxy from 'utilise/proxy'
 import attr from 'utilise/attr'
-import body from 'utilise/body'
 import noop from 'utilise/noop'
 import time from 'utilise/time'
 import key from 'utilise/key'
