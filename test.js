@@ -5,6 +5,7 @@ var expect = require('chai').expect
   , once = require('utilise/once')
   , push = require('utilise/push')
   , key = require('utilise/key')
+  , lo = require('utilise/lo')
   , components = require('./').default
   , core = require('rijs.core').default
   , data = require('rijs.data').default
@@ -456,4 +457,20 @@ describe('Custom Elements', function(){
     })
   })
 
+  it('should pass root as parameter', function(done){
+    var elA = once(container)('component-29', 1).node()
+      , elB = once(container)('component-30', 1).node()
+      , ripple = components(fn(data(core())))
+      , result1, result2
+
+    Object.defineProperty(elB, 'shadowRoot', { value: elA })
+    ripple('component-29', function(d, i, el){ result1 = el })
+    ripple('component-30', function(d, i, el){ result2 = el })
+    
+    time(40, function(){ 
+      expect(lo(result1.nodeName)).to.be.eql('component-29')
+      expect(lo(result2.nodeName)).to.be.eql('component-29')
+      done()
+    })
+  })
 })

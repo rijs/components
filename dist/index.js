@@ -150,13 +150,14 @@ var render = function render(ripple) {
     var name = (0, _lo2.default)(el.tagName),
         deps = (0, _attr2.default)(el, 'data'),
         fn = body(ripple)(name),
-        data = bodies(ripple)(deps);
+        data = bodies(ripple)(deps),
+        root = el.shadowRoot || el;
 
     if (!fn) return el;
     if (deps && !data) return el;
 
     try {
-      fn.call(el.shadowRoot || el, defaults(el, data), index(el));
+      fn.call(root, defaults(el, data), index(el), root);
     } catch (e) {
       err(e, e.stack);
     }

@@ -84,12 +84,13 @@ const render = ripple => el => {
       , deps = attr(el, 'data')
       , fn   = body(ripple)(name)
       , data = bodies(ripple)(deps)
-
+      , root = el.shadowRoot || el
+      
   if (!fn) return el
   if (deps && !data) return el
 
   try {
-    fn.call(el.shadowRoot || el, defaults(el, data), index(el))
+    fn.call(root, defaults(el, data), index(el), root)
   } catch (e) {
     err(e, e.stack)
   }
