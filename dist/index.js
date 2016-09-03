@@ -157,7 +157,7 @@ var render = function render(ripple) {
     if (deps && !data) return el;
 
     try {
-      fn.call(root, defaults(el, data), index(el), root);
+      fn.call(root, root, defaults(el, data));
     } catch (e) {
       err(e, e.stack);
     }
