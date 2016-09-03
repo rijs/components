@@ -46,7 +46,6 @@ describe('Custom Elements', function(){
       expect(result2).to.equal(el2)
       done()
     })
-
   })
 
   it('should draw a d3 node', function(done){  
@@ -76,7 +75,7 @@ describe('Custom Elements', function(){
       , result
 
     ripple('array', [1, 2, 3])
-    ripple('component-5', function(d){ result = d })
+    ripple('component-5', function(n, d){ result = d })
 
     time(20, function(){
       expect(result).to.eql({ array: [1, 2, 3] })
@@ -91,7 +90,7 @@ describe('Custom Elements', function(){
 
     ripple('array', [1, 2, 3])
     ripple('object', { foo: 'bar' })
-    ripple('component-6', function(d){ result = d })
+    ripple('component-6', function(n, d){ result = d })
 
     time(20, function(){
       expect(result).to.eql({ array: [1, 2, 3], object: { foo: 'bar' }})
@@ -105,7 +104,7 @@ describe('Custom Elements', function(){
       , result
 
     el.__data__ = { foo: 'bar' }
-    ripple('component-7', function(d){ result = d })
+    ripple('component-7', function(n, d){ result = d })
 
     time(20, function(){
       expect(result).to.eql({ foo: 'bar' })
@@ -119,7 +118,7 @@ describe('Custom Elements', function(){
       , result
 
     el.state = { focused: true }
-    ripple('component-8', function(d){ result = d })
+    ripple('component-8', function(n, d){ result = d })
 
     time(20, function(){
       expect(result).to.eql({ focused: true })
@@ -135,7 +134,7 @@ describe('Custom Elements', function(){
     el.__data__ = { foo: 'bar' }
     el.state = { focused: true }
     ripple('array', [1, 2, 3])
-    ripple('component-9', function(d){ result = d })
+    ripple('component-9', function(n, d){ result = d })
 
     time(20, function(){
       expect(result)
@@ -266,7 +265,6 @@ describe('Custom Elements', function(){
         done()
       })
     })
-
   })
 
   it('should not draw if missing deps', function(done){  
@@ -349,7 +347,6 @@ describe('Custom Elements', function(){
       document.registerElement = original
       done()
     })
-
   })
 
   it('should always extend existing state', function(done){  
@@ -408,19 +405,6 @@ describe('Custom Elements', function(){
     })
   })
 
-  it('should pass index as implicit data', function(done){
-    var el = once(container)('component-26', 1).node()
-      , ripple = components(fn(data(core())))
-      , result
-
-    ripple('component-26', function(d, i){ result = i })
-    
-    time(40, function(){ 
-      expect(result).to.be.eql(0)
-      done()
-    })
-  })
-
   it('should draw server-rendered elements', function(done){
     var ripple = components(fn(data(core())))
       , result
@@ -464,8 +448,8 @@ describe('Custom Elements', function(){
       , result1, result2
 
     Object.defineProperty(elB, 'shadowRoot', { value: elA })
-    ripple('component-29', function(d, i, el){ result1 = el })
-    ripple('component-30', function(d, i, el){ result2 = el })
+    ripple('component-29', function(n, d){ result1 = n })
+    ripple('component-30', function(n, d){ result2 = n })
     
     time(40, function(){ 
       expect(lo(result1.nodeName)).to.be.eql('component-29')
