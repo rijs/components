@@ -423,7 +423,7 @@ describe('Custom Elements', function(){
       , result
 
     once(container)('component-28[data="foo"]', 1)
-    ripple('component-28', function(){ result = this.change })
+    ripple('component-28', function(){ result = this.changes })
     ripple('foo', [{ bar: 5 }, { baz: 10 }])
 
     time(50, function(){
@@ -434,8 +434,8 @@ describe('Custom Elements', function(){
 
     time(100, function(){
       expect(result).to.eql([
-        ['foo', { type: 'update', key: 'bar', value: 15, time: 1}]
-      , ['foo', { type: 'update', key: 'baz', value: 25, time: 2}]
+        { type: 'update', key: 'bar', value: 15, time: 1}
+      , { type: 'update', key: 'baz', value: 25, time: 2}
       ])
       done()
     })
