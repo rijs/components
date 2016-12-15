@@ -125,11 +125,16 @@ var resource = function resource(ripple) {
 // batch renders on render frames
 var batch = function batch(ripple) {
   return function (el) {
-    return el.pending ? el.pending.push(ripple.change) : (el.pending = [ripple.change], requestAnimationFrame(function (d) {
-      el.change = el.pending;
-      delete el.pending;
-      ripple.render(el);
-    }));
+    if (!el.pending) {
+      el.pending = [];
+      requestAnimationFrame(function (d) {
+        el.changes = el.pending;
+        delete el.pending;
+        ripple.render(el);
+      });
+    }
+
+    if (ripple.change) el.pending.push(ripple.change[1]);
   };
 };
 
