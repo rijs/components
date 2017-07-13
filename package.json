@@ -12,7 +12,7 @@
     "babel": "babel src -d dist",
     "clean": "rm -rf dist && mkdir dist",
     "build": "npm run clean && npm run babel && npm run ignore",
-    "test": "popper",
+    "test": "popper --color",
     "version": "npm run build && git add -A",
     "postversion": "git push && git push --tags"
   },
