@@ -85,17 +85,26 @@ const invoke = ripple => el => {
 }
 
 const render = ripple => el => {
-  const name = lo(el.tagName)
-      , deps = attr(el, 'data')
-      , fn   = body(ripple)(name)
-      , data = bodies(ripple)(deps)
-      , root = el.shadowRoot || el
-      
+  let root = el.shadowRoot || el
+    , deps = attr(el, 'data')
+    , data = bodies(ripple)(deps)
+    , fn   = body(ripple)(lo(el.tagName))
+    
   if (!fn) return el
   if (deps && !data) return el
+  if (fn.prototype.render && !root.render) {
+    Object.getOwnPropertyNames(fn.prototype)
+      .map(method => root[method] = fn.prototype[method].bind(root))
+
+    Promise
+      .resolve((root.init || noop).call(root, root))
+      .then(d => ripple.draw(root.initialised = root))
+    return el
+  }
+  if (fn.prototype.render && !root.initialised) return
 
   try {
-    fn.call(root, root, defaults(el, data))
+    (root.render || fn).call(root, root, defaults(el, data))
   } catch (e) {
     err(e, e.stack)
   }

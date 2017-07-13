@@ -1,5 +1,6 @@
 var expect = require('chai').expect
   , values = require('utilise/values')
+  , clone = require('utilise/clone')
   , attr = require('utilise/attr')
   , time = require('utilise/time')
   , once = require('utilise/once')
@@ -41,7 +42,7 @@ describe('Custom Elements', function(){
     expect(ripple.draw(el1)).to.equal(el1)
     expect(ripple.draw.call(el2)).to.equal(el2)
 
-    time(40, function() {
+    time(80, function() {
       expect(result1).to.equal(el1)
       expect(result2).to.equal(el2)
       done()
@@ -457,4 +458,81 @@ describe('Custom Elements', function(){
       done()
     })
   })
+    
+  it('should render class component', function(done){
+    var el = once(container)('component-class', 1).node()
+      , ripple = components(fn(data(core())))
+      , init, render
+
+    ripple('component-class', class component1 {
+      init(node) { init = { this: this, node }}
+      render(node, state) { render = { this: this , node, state } }
+    })
+    
+    time(40, function(){ 
+      expect(lo(render.node.nodeName)).to.be.eql('component-class')
+      expect(init).to.be.eql({ this: el, node: el })
+      expect(render).to.be.eql({ this: el, node: el, state: {} })
+      done()
+    })
+  })
+
+  it('should render class component with no init', function(done){
+    var el = once(container)('component-class-no-init', 1).node()
+      , ripple = components(fn(data(core())))
+      , render
+
+    ripple('component-class-no-init', class component2 {
+      render(node, state) { render = { this: this , node, state } }
+    })
+    
+    time(40, function(){ 
+      expect(lo(render.node.nodeName)).to.be.eql('component-class-no-init')
+      expect(render).to.be.eql({ this: el, node: el, state: {} })
+      done()
+    })
+  })
+
+  it('should render class component with async init', function(done){
+    var el = once(container)('component-class-async-init', 1).node()
+      , ripple = components(fn(data(core())))
+      , render
+
+    ripple('component-class-async-init', class component3 {
+      init(node) { 
+        return Promise
+          .resolve('foo')
+          .then(foo => node.state = { foo })
+      }
+      render(node, state) { 
+        this.rendered = (this.rendered || 0) + 1
+        render = clone(this.state)
+      }
+    })
+    
+    time(40, function(){ 
+      expect(el.rendered).to.be.eql(1)
+      expect(render).to.be.eql({ foo: 'foo' })
+      done()
+    })
+  })
+
+  it('should render class component with methods prebound', function(done){
+    var el = once(container)('component-class-prebound', 1).node()
+      , ripple = components(fn(data(core())))
+      , method
+
+    ripple('component-class-prebound', class component4 {
+      method(){ method = this }
+      render(node, state) { 
+        var fn = node.method 
+        fn()
+      }
+    })
+    
+    time(40, function(){ 
+      expect(method).to.be.eql(el)
+      done()
+    })
+  })  
 })
