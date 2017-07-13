@@ -152,17 +152,27 @@ var invoke = function invoke(ripple) {
 
 var render = function render(ripple) {
   return function (el) {
-    var name = (0, _lo2.default)(el.tagName),
+    var root = el.shadowRoot || el,
         deps = (0, _attr2.default)(el, 'data'),
-        fn = body(ripple)(name),
         data = bodies(ripple)(deps),
-        root = el.shadowRoot || el;
+        fn = body(ripple)((0, _lo2.default)(el.tagName));
 
     if (!fn) return el;
     if (deps && !data) return el;
+    if (fn.prototype.render && !root.render) {
+      Object.getOwnPropertyNames(fn.prototype).map(function (method) {
+        return root[method] = fn.prototype[method].bind(root);
+      });
+
+      Promise.resolve((root.init || _noop2.default).call(root, root)).then(function (d) {
+        return ripple.draw(root.initialised = root);
+      });
+      return el;
+    }
+    if (fn.prototype.render && !root.initialised) return;
 
     try {
-      fn.call(root, root, defaults(el, data));
+      (root.render || fn).call(root, root, defaults(el, data));
     } catch (e) {
       err(e, e.stack);
     }
