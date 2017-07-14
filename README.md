@@ -1,6 +1,7 @@
 # Ripple | Components
 [![Coverage Status](https://coveralls.io/repos/rijs/components/badge.svg?branch=master&service=github)](https://coveralls.io/github/rijs/components?branch=master)
 [![Build Status](https://travis-ci.org/rijs/components.svg)](https://travis-ci.org/rijs/components)
+<br>[![Browser Results](https://saucelabs.com/browser-matrix/rijs-components.svg)](https://saucelabs.com/u/rijs-components)
 
 Redraws any custom elements on the page when any of it's dependencies change (either the component definition, data, or styles).
 
