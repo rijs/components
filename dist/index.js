@@ -155,11 +155,12 @@ var render = function render(ripple) {
     var root = el.shadowRoot || el,
         deps = (0, _attr2.default)(el, 'data'),
         data = bodies(ripple)(deps),
-        fn = body(ripple)((0, _lo2.default)(el.tagName));
+        fn = body(ripple)((0, _lo2.default)(el.tagName)),
+        isClass = fn && fn.prototype && fn.prototype.render;
 
     if (!fn) return el;
     if (deps && !data) return el;
-    if (fn.prototype.render && !root.render) {
+    if (isClass && !root.render) {
       Object.getOwnPropertyNames(fn.prototype).map(function (method) {
         return root[method] = fn.prototype[method].bind(root);
       });
@@ -169,7 +170,7 @@ var render = function render(ripple) {
       });
       return el;
     }
-    if (fn.prototype.render && !root.initialised) return;
+    if (isClass && !root.initialised) return;
 
     try {
       (root.render || fn).call(root, root, defaults(el, data));
