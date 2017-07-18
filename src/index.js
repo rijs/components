@@ -89,10 +89,11 @@ const render = ripple => el => {
     , deps = attr(el, 'data')
     , data = bodies(ripple)(deps)
     , fn   = body(ripple)(lo(el.tagName))
-    
+    , isClass = fn && fn.prototype && fn.prototype.render
+
   if (!fn) return el
   if (deps && !data) return el
-  if (fn.prototype.render && !root.render) {
+  if (isClass && !root.render) {
     Object.getOwnPropertyNames(fn.prototype)
       .map(method => root[method] = fn.prototype[method].bind(root))
 
@@ -101,7 +102,7 @@ const render = ripple => el => {
       .then(d => ripple.draw(root.initialised = root))
     return el
   }
-  if (fn.prototype.render && !root.initialised) return
+  if (isClass && !root.initialised) return
 
   try {
     (root.render || fn).call(root, root, defaults(el, data))

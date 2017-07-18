@@ -535,4 +535,20 @@ describe('Custom Elements', function(){
       done()
     })
   })  
+
+  it('should render prototypeless arrow functions', function(done){
+    var el = once(container)('component-arrow', 1).node()
+      , ripple = components(fn(data(core())))
+      , result
+      , arrowfn = () => (result = true)
+
+    arrowfn.prototype = undefined
+    ripple('component-arrow', arrowfn)
+    
+    time(40, function(){ 
+      expect(result).to.be.eql(true)
+      done()
+    })
+  })  
+
 })
