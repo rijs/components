@@ -9,7 +9,7 @@
 // ripple.draw({ ... })          - redraw elements that depend on resource
 // MutationObserver(ripple.draw) - redraws element being observed
 
-export default function components(ripple){
+module.exports = function components(ripple){
   if (!client) return ripple
   log('creating')
   
@@ -140,22 +140,22 @@ const body = ripple => name => ripple.resources[name] && ripple.resources[name].
 
 const index = el => Array.prototype.indexOf.call(key('parentNode.children')(el) || [], el)
 
-import overwrite from 'utilise/overwrite'
-import includes from 'utilise/includes'
-import header from 'utilise/header'
-import client from 'utilise/client'
-import values from 'utilise/values'
-import proxy from 'utilise/proxy'
-import attr from 'utilise/attr'
-import noop from 'utilise/noop'
-import time from 'utilise/time'
-import key from 'utilise/key'
-import all from 'utilise/all'
-import is from 'utilise/is'
-import lo from 'utilise/lo'
-import data from './types/data'
-import fn from './types/fn'
-const log = require('utilise/log')('[ri/components]')
+const overwrite = require('utilise/overwrite')
+    , includes = require('utilise/includes')
+    , header = require('utilise/header')
+    , client = require('utilise/client')
+    , values = require('utilise/values')
+    , proxy = require('utilise/proxy')
+    , attr = require('utilise/attr')
+    , noop = require('utilise/noop')
+    , time = require('utilise/time')
+    , key = require('utilise/key')
+    , all = require('utilise/all')
+    , is = require('utilise/is')
+    , lo = require('utilise/lo')
+    , data = require('./types/data')
+    , fn = require('./types/fn')
+    , log = require('utilise/log')('[ri/components]')
     , err = require('utilise/err')('[ri/components]')
     , mutation = client && window.MutationRecord || noop
     , customs = client && !!document.registerElement

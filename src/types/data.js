@@ -1,5 +1,5 @@
 // render all elements that require the specified data
-import all from 'utilise/all'
+const all = require('utilise/all')
 
-export default ripple => res => all('[data~="'+res.name+'"]')
+module.exports = ripple => res => all('[data~="'+res.name+'"]')
     .map(ripple.draw)
