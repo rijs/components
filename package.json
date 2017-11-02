@@ -1,41 +1,39 @@
 {
   "name": "rijs.components",
   "version": "1.1.0",
-  "main": "dist",
+  "main": "index",
   "author": "Pedram Emrouznejad (https://github.com/pemrouz)",
   "repository": {
     "type": "git",
     "url": "git://github.com/rijs/components.git"
   },
   "scripts": {
-    "ignore": "find ./dist -type f -exec sed -i \"s/var _interopRequire/\\/* istanbul ignore next *\\/\\nvar _interopRequire/g\" {} ';'",
-    "babel": "babel src -d dist",
-    "clean": "rm -rf dist && mkdir dist",
-    "build": "npm run clean && npm run babel && npm run ignore",
+    "build": "npm run rollup && npm run minify && npm run gzip",
+    "rollup": "rollup -c",
+    "minify": "uglifyjs client.bundle.js -m -c keep_fargs=false > client.min.js",
+    "gzip": "gzip -c client.min.js > client.min.js.gz",
     "test": "popper --color",
     "version": "npm run build && git add -A",
     "postversion": "git push && git push --tags"
   },
   "license": "pemrouz.mit-license.org",
   "devDependencies": {
-    "babel-cli": "*",
-    "babel-preset-es2015": "*",
-    "browserify": "*",
     "chai": "*",
-    "popper": "*",
     "coveralls": "*",
     "istanbul": "*",
     "mocha": "*",
     "mocha-lcov-reporter": "*",
-    "uglify-js": "*",
+    "popper": "pemrouz/popper",
     "rijs.core": "*",
     "rijs.data": "*",
-    "rijs.fn": "*"
+    "rijs.fn": "*",
+    "rollup": "*",
+    "rollup-plugin-buble": "^0.16.0",
+    "rollup-plugin-commonjs": "^8.2.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "uglify-es": "*"
   },
   "dependencies": {
-    "estree-walker": "^0.4.0",
-    "rollup-plugin-async": "^1.2.0",
-    "rollup-pluginutils": "^2.0.1",
     "utilise": "*"
   }
 }

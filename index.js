@@ -9,17 +9,14 @@
 // ripple.draw({ ... })          - redraw elements that depend on resource
 // MutationObserver(ripple.draw) - redraws element being observed
 
-export default function components(ripple){
+module.exports = function components(ripple){
   if (!client) return ripple
   log('creating')
   
-  values(ripple.types).map(type => type.parse = proxy(type.parse, clean(ripple)))
-  key('types.application/javascript.render', d => fn(ripple))(ripple)
-  key('types.application/data.render', d => data(ripple))(ripple)
   ripple.draw = Node.prototype.draw = draw(ripple)
   ripple.render = render(ripple)
   ripple.on('change.draw', ripple.draw)
-  time(0, ripple.draw)
+  ready(start(ripple))
   return ripple
 }
 
@@ -39,24 +36,27 @@ function draw(ripple){
   }
 }
 
+const start = ripple => d => all('*')
+  .filter(by('nodeName', includes('-')))
+  .map(ripple.draw)
+
 // render all components
 const everything = ripple => {
   const selector = values(ripple.resources)
-    .filter(header('content-type', 'application/javascript'))
-    .map(key('name'))
+    .map(res => (ripple.types[res.headers['content-type']].selector || noop)(res))
     .join(',')
 
-  return !selector ? [] 
-       : all(selector)
-           .map(invoke(ripple))
+  return all(selector || null)
+    .map(invoke(ripple))
 }
 
 // render all elements that depend on the resource
 const resource = ripple => name => { 
-  const res = ripple.resources[name]
-      , type = header('content-type')(res)
+  const res  = ripple.resources[name]
+      , type = res.headers['content-type']
 
-  return (ripple.types[type].render || noop)(res)  
+  return all((ripple.types[type].selector || noop)(res))
+    .map(invoke(ripple))
 }
 
 // batch renders on render frames
@@ -93,12 +93,12 @@ const render = ripple => el => {
 
   if (!fn) return el
   if (deps && !data) return el
-  if (isClass && !root.render) {
-    Object.getOwnPropertyNames(fn.prototype)
+  if (isClass && root.class != fn) {
+    Object.getOwnPropertyNames((root.class = fn).prototype)
       .map(method => root[method] = fn.prototype[method].bind(root))
 
     Promise
-      .resolve((root.init || noop).call(root, root))
+      .resolve((root.init || noop).call(root, root, root.state = root.state || {}))
       .then(d => ripple.draw(root.initialised = root))
     return el
   }
@@ -112,9 +112,6 @@ const render = ripple => el => {
 
   return el
 }
-
-// clean local headers for transport
-const clean = ripple =>  res => (delete res.headers.pending, res)
 
 // helpers
 const defaults = (el, data) => {
@@ -140,26 +137,24 @@ const body = ripple => name => ripple.resources[name] && ripple.resources[name].
 
 const index = el => Array.prototype.indexOf.call(key('parentNode.children')(el) || [], el)
 
-import overwrite from 'utilise/overwrite'
-import includes from 'utilise/includes'
-import header from 'utilise/header'
-import client from 'utilise/client'
-import values from 'utilise/values'
-import proxy from 'utilise/proxy'
-import attr from 'utilise/attr'
-import noop from 'utilise/noop'
-import time from 'utilise/time'
-import key from 'utilise/key'
-import all from 'utilise/all'
-import is from 'utilise/is'
-import lo from 'utilise/lo'
-import data from './types/data'
-import fn from './types/fn'
-const log = require('utilise/log')('[ri/components]')
+const overwrite = require('utilise/overwrite')
+    , includes = require('utilise/includes')
+    , client = require('utilise/client')
+    , values = require('utilise/values')
+    , ready = require('utilise/ready')
+    , attr = require('utilise/attr')
+    , noop = require('utilise/noop')
+    , time = require('utilise/time')
+    , key = require('utilise/key')
+    , all = require('utilise/all')
+    , is = require('utilise/is')
+    , by = require('utilise/by')
+    , lo = require('utilise/lo')
+    , log = require('utilise/log')('[ri/components]')
     , err = require('utilise/err')('[ri/components]')
     , mutation = client && window.MutationRecord || noop
-    , customs = client && !!document.registerElement
+    , customs = client && !!window.document.registerElement
     , isAttached = customs
                   ? 'html *, :host-context(html) *'
                   : 'html *'
-client && (Element.prototype.matches = Element.prototype.matches || Element.prototype.msMatchesSelector)
+client && (window.Element.prototype.matches = window.Element.prototype.matches || window.Element.prototype.msMatchesSelector)

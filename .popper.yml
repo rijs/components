@@ -1,10 +1,11 @@
 globals:
   - <script src="https://cdn.polyfill.io/v1/polyfill.min.js"></script>
-  - <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.0.0/chai.min.js"></script>
+  - <script src="/chai.js"></script>
+  # - <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.0.0/chai.min.js"></script>
 
 farm: saucelabs
   
-tests: (npm run build > /dev/null) && babel test.js | browserify -
+tests: (npm run build > /dev/null) && buble test.js | browserify -
   -i colors
   -i chai
   | sed -E "s/require\('chai'\)/window.chai/"
@@ -16,5 +17,4 @@ watch:
 browsers:
   - chrome
   - firefox
-  - ie11
-  # - ie9
+  - edge

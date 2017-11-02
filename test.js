@@ -7,10 +7,10 @@ var expect = require('chai').expect
   , push = require('utilise/push')
   , key = require('utilise/key')
   , lo = require('utilise/lo')
-  , components = require('./').default
-  , core = require('rijs.core').default
-  , data = require('rijs.data').default
-  , fn = require('rijs.fn').default
+  , components = require('./')
+  , core = require('rijs.core')
+  , data = require('rijs.data')
+  , fn = require('rijs.fn')
   , container = document.createElement('div')
 
 describe('Custom Elements', function(){
@@ -210,8 +210,8 @@ describe('Custom Elements', function(){
       , ripple = components(fn(data(core())))
       , result1, result2, result3
 
-    ripple('array')
-    ripple('object')
+    ripple('array', [])
+    ripple('object', {})
     ripple('component-14', function(){ result1 = this })
     ripple('component-15', function(){ result2 = this })
     ripple('component-16', function(){ result3 = this })
@@ -247,11 +247,10 @@ describe('Custom Elements', function(){
   })
 
   it('should not draw inert elements', function(done){  
-    var el = once(container)('component-18', 1).node()
+    var el = once(container)('component-18[inert=""]', 1).node()
       , ripple = components(fn(data(core())))
       , result
 
-    attr(el, 'inert', '')
     ripple('component-18', function(){ result = this })
     
     ripple.draw(el)
@@ -410,8 +409,8 @@ describe('Custom Elements', function(){
     var ripple = components(fn(data(core())))
       , result
 
-    ripple('component-27', function(){ result = true })
     container.appendChild(document.createElement('component-27'))
+    ripple('component-27', function(){ result = true })
 
     time(40, function(){
       expect(result).to.be.ok
