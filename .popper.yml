@@ -3,7 +3,8 @@ globals:
   - <script src="/chai.js"></script>
   # - <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.0.0/chai.min.js"></script>
 
-farm: saucelabs
+# too flaky, switch back to browserstack 
+# farm: saucelabs
   
 tests: (npm run build > /dev/null) && buble test.js | browserify -
   -i colors
