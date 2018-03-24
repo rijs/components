@@ -456,7 +456,7 @@ var components = (function () {
       Node.prototype.draw = function () {
           this.render();
       };
-      ready(function () { return Array.from(document.querySelectorAll('*')).filter(function (d) { return d.includes('-'); }).map(function (node) { return node.render(); }); });
+      ready(function () { return Array.from(document.querySelectorAll('*')).filter(function (d) { return d.nodeName.includes('-'); }).map(function (node) { return node.render(); }); });
       return ripple;
   };
   var log$1 = log('[ri/components]');

@@ -20,7 +20,7 @@ module.exports = function components(ripple){
   }
 
   ready(() => Array.from(document.querySelectorAll('*'))
-    .filter(d => d.includes('-'))
+    .filter(d => d.nodeName.includes('-'))
     .map(node => node.render())
   )
 
