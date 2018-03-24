@@ -106,9 +106,9 @@ var components = (function () {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
 
-  var client$1 = typeof window != 'undefined';
+  var client = typeof window != 'undefined';
 
-  var owner = client$1 ? window : commonjsGlobal;
+  var owner = client ? window : commonjsGlobal;
 
   var log = function log(ns) {
       return function (d) {
@@ -353,7 +353,7 @@ var components = (function () {
   var define = createCommonjsModule(function (module) {
       var id = {
           count: 0
-      }, noop = function () {}, HTMLElement = client$1 ? window.HTMLElement : (function () {
+      }, noop = function () {}, HTMLElement = client ? window.HTMLElement : (function () {
           function anonymous () {}
 
           return anonymous;
@@ -364,7 +364,7 @@ var components = (function () {
           }
           if (!name.includes('-')) 
               { return; }
-          if (!client$1) 
+          if (!client) 
               { return wrap(component); }
           var wrapped = customElements.get(name);
           if (wrapped) {
