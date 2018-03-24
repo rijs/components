@@ -23,4 +23,5 @@ module.exports = function components(ripple){
 }
 
 const log = require('utilise/log')('[ri/components]')
+    , client = require('utilise/client')
     , define = require('@compone/define')
