@@ -19,9 +19,16 @@ module.exports = function components(ripple){
     this.render() 
   }
 
+  ready(function(){
+    const start = document.querySelectorAll('*')
+      .filter(d => d.includes('-'))
+      .map(node => node.render())
+  })
+  
   return ripple
 }
 
 const log = require('utilise/log')('[ri/components]')
     , client = require('utilise/client')
+    , ready = require('utilise/ready')
     , define = require('@compone/define')
