@@ -1,427 +1,461 @@
 var components = (function () {
-'use strict';
+  'use strict';
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-
-
-
-
-function createCommonjsModule(fn, module) {
-	return module = { exports: {} }, fn(module, module.exports), module.exports;
-}
-
-var is_1 = is;
-is.fn      = isFunction;
-is.str     = isString;
-is.num     = isNumber;
-is.obj     = isObject;
-is.lit     = isLiteral;
-is.bol     = isBoolean;
-is.truthy  = isTruthy;
-is.falsy   = isFalsy;
-is.arr     = isArray;
-is.null    = isNull;
-is.def     = isDef;
-is.in      = isIn;
-is.promise = isPromise;
-is.stream  = isStream;
-
-function is(v){
-  return function(d){
-    return d == v
-  }
-}
-
-function isFunction(d) {
-  return typeof d == 'function'
-}
-
-function isBoolean(d) {
-  return typeof d == 'boolean'
-}
-
-function isString(d) {
-  return typeof d == 'string'
-}
-
-function isNumber(d) {
-  return typeof d == 'number'
-}
-
-function isObject(d) {
-  return typeof d == 'object'
-}
-
-function isLiteral(d) {
-  return typeof d == 'object' 
-      && !(d instanceof Array)
-}
-
-function isTruthy(d) {
-  return !!d == true
-}
-
-function isFalsy(d) {
-  return !!d == false
-}
-
-function isArray(d) {
-  return d instanceof Array
-}
-
-function isNull(d) {
-  return d === null
-}
-
-function isDef(d) {
-  return typeof d !== 'undefined'
-}
-
-function isPromise(d) {
-  return d instanceof Promise
-}
-
-function isStream(d) {
-  return !!(d && d.next)
-}
-
-function isIn(set) {
-  return function(d){
-    return !set ? false  
-         : set.indexOf ? ~set.indexOf(d)
-         : d in set
-  }
-}
-
-var keys = function keys(o) { 
-  return Object.keys(is_1.obj(o) || is_1.fn(o) ? o : {})
-};
-
-var copy = function copy(from, to){ 
-  return function(d){ 
-    return to[d] = from[d], d
-  }
-};
-
-var overwrite = function overwrite(to){ 
-  return function(from){
-    keys(from)
-      .map(copy(from, to));
-        
-    return to
-  }
-};
-
-var includes = function includes(pattern){
-  return function(d){
-    return d && d.indexOf && ~d.indexOf(pattern)
-  }
-};
-
-var client = typeof window != 'undefined';
-
-var datum = function datum(node){
-  return node.__data__
-};
-
-var wrap = function wrap(d){
-  return function(){
-    return d
-  }
-};
-
-var str = function str(d){
-  return d === 0 ? '0'
-       : !d ? ''
-       : is_1.fn(d) ? '' + d
-       : is_1.obj(d) ? JSON.stringify(d)
-       : String(d)
-};
-
-var key = function key(k, v){ 
-  var set = arguments.length > 1
-    , keys = is_1.fn(k) ? [] : str(k).split('.')
-    , root = keys.shift();
-
-  return function deep(o, i){
-    var masked = {};
-    
-    return !o ? undefined 
-         : !is_1.num(k) && !k ? o
-         : is_1.arr(k) ? (k.map(copy), masked)
-         : o[k] || !keys.length ? (set ? ((o[k] = is_1.fn(v) ? v(o[k], i) : v), o)
-                                       :  (is_1.fn(k) ? k(o) : o[k]))
-                                : (set ? (key(keys.join('.'), v)(o[root] ? o[root] : (o[root] = {})), o)
-                                       :  key(keys.join('.'))(o[root]))
-
-    function copy(k){
-      var val = key(k)(o);
-      if (val != undefined) 
-        { key(k, is_1.fn(val) ? wrap(val) : val)(masked); }
-    }
-  }
-};
-
-var from_1 = from;
-from.parent = fromParent;
-
-function from(o){
-  return function(k){
-    return key(k)(o)
-  }
-}
-
-function fromParent(k){
-  return datum(this.parentNode)[k]
-}
-
-var values = function values(o) {
-  return !o ? [] : keys(o).map(from_1(o))
-};
-
-var ready = function ready(fn){
-  return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn.bind(this))
-};
-
-var attr = function attr(name, value) {
-  var args = arguments.length;
-  
-  return !is_1.str(name) && args == 2 ? attr(arguments[1]).call(this, arguments[0])
-       : !is_1.str(name) && args == 3 ? attr(arguments[1], arguments[2]).call(this, arguments[0])
-       :  function(el){
-            var ctx = this || {};
-            el = ctx.nodeName || is_1.fn(ctx.node) ? ctx : el;
-            el = el.node ? el.node() : el;
-            el = el.host || el;
-
-            return args > 1 && value === false ? el.removeAttribute(name)
-                 : args > 1                    ? (el.setAttribute(name, value), value)
-                 : el.attributes.getNamedItem(name) 
-                && el.attributes.getNamedItem(name).value
-          } 
-};
-
-var noop = function noop(){};
-
-var to = { 
-  arr: toArray
-, obj: toObject
-};
-
-function toArray(d){
-  return Array.prototype.slice.call(d, 0)
-}
-
-function toObject(d) {
-  var by = 'id';
-
-  return arguments.length == 1 
-    ? (by = d, reduce)
-    : reduce.apply(this, arguments)
-
-  function reduce(p,v,i){
-    if (i === 0) { p = {}; }
-    p[is_1.fn(by) ? by(v, i) : v[by]] = v;
-    return p
-  }
-}
-
-var all = function all(selector, doc){
-  var prefix = !doc && document.head.createShadowRoot ? 'html /deep/ ' : '';
-  return to.arr((doc || document).querySelectorAll(prefix+selector))
-};
-
-var by = function by(k, v){
-  var exists = arguments.length == 1;
-  return function(o){
-    var d = is_1.fn(k) ? k(o) : key(k)(o);
-    
-    return d && v && d.toLowerCase && v.toLowerCase ? d.toLowerCase() === v.toLowerCase()
-         : exists ? Boolean(d)
-         : is_1.fn(v) ? v(d)
-         : d == v
-  }
-};
-
-var lo = function lo(d){
-  return (d || '').toLowerCase()
-};
-
-var owner = client ? /* istanbul ignore next */ window : commonjsGlobal;
-
-var log = function log(ns){
-  return function(d){
-    if (!owner.console || !console.log.apply) { return d; }
-    is_1.arr(arguments[2]) && (arguments[2] = arguments[2].length);
-    var args = to.arr(arguments)
-      , prefix = '[log][' + (new Date()).toISOString() + ']' + ns;
-
-    args.unshift(prefix.grey ? prefix.grey : prefix);
-    return console.log.apply(console, args), d
-  }
-};
-
-var err = function err(ns){
-  return function(d){
-    if (!owner.console || !console.error.apply) { return d; }
-    is_1.arr(arguments[2]) && (arguments[2] = arguments[2].length);
-    var args = to.arr(arguments)
-      , prefix = '[err][' + (new Date()).toISOString() + ']' + ns;
-
-    args.unshift(prefix.red ? prefix.red : prefix);
-    return console.error.apply(console, args), d
-  }
-};
-
-var components = createCommonjsModule(function (module) {
-// -------------------------------------------
-// API: Renders specific nodes, resources or everything
-// -------------------------------------------
-// ripple.draw()                 - redraw all components on page
-// ripple.draw(element)          - redraw specific element
-// ripple.draw.call(element)     - redraw specific element
-// ripple.draw.call(selection)   - redraw D3 selection
-// ripple.draw('name')           - redraw elements that depend on resource
-// ripple.draw({ ... })          - redraw elements that depend on resource
-// MutationObserver(ripple.draw) - redraws element being observed
-
-module.exports = function components(ripple){
-  if (!client) { return ripple }
-  log$$1('creating');
-  
-  ripple.draw = Node.prototype.draw = draw(ripple);
-  ripple.render = render(ripple);
-  ripple.on('change.draw', ripple.draw);
-  ready(start(ripple));
-  return ripple
-};
-
-// public draw api
-function draw(ripple){
-  return function(thing) { 
-    return this && this.nodeName        ? invoke(ripple)(this)
-         : this && this.node            ? invoke(ripple)(this.node())
-         : !thing                       ? everything(ripple)
-         : thing    instanceof mutation ? invoke(ripple)(thing.target)
-         : thing[0] instanceof mutation ? invoke(ripple)(thing[0].target)
-         : thing.nodeName               ? invoke(ripple)(thing)
-         : thing.node                   ? invoke(ripple)(thing.node())
-         : thing.name                   ? resource(ripple)(thing.name)
-         : is_1.str(thing)                ? resource(ripple)(thing)
-         : err$$1('could not update', thing)
-  }
-}
-
-var start = function (ripple) { return function (d) { return all('*')
-  .filter(by('nodeName', includes('-')))
-  .map(ripple.draw); }; };
-
-// render all components
-var everything = function (ripple) {
-  var selector = values(ripple.resources)
-    .map(function (res) { return (ripple.types[res.headers['content-type']].selector || noop)(res); })
-    .join(',');
-
-  return all(selector || null)
-    .map(invoke(ripple))
-};
-
-// render all elements that depend on the resource
-var resource = function (ripple) { return function (name) { 
-  var res  = ripple.resources[name]
-      , type = res.headers['content-type'];
-
-  return all((ripple.types[type].selector || noop)(res))
-    .map(invoke(ripple))
-}; };
-
-// batch renders on render frames
-var batch = function (ripple) { return function (el) {
-  if (!el.pending) {
-    el.pending = [];
-    requestAnimationFrame(function (d) {
-      el.changes = el.pending;
-      delete el.pending;
-      ripple.render(el);
-    });    
+  var is_1 = is;
+  is.fn = isFunction;
+  is.str = isString;
+  is.num = isNumber;
+  is.obj = isObject;
+  is.lit = isLiteral;
+  is.bol = isBoolean;
+  is.truthy = isTruthy;
+  is.falsy = isFalsy;
+  is.arr = isArray;
+  is.null = isNull;
+  is.def = isDef;
+  is.in = isIn;
+  is.promise = isPromise;
+  is.stream = isStream;
+  function is(v) {
+      return function (d) {
+          return d == v;
+      };
   }
 
-  if (ripple.change) 
-    { el.pending.push(ripple.change[1]); }
-}; };
-
-// main function to render a particular custom element with any data it needs
-var invoke = function (ripple) { return function (el) { 
-  if (!includes('-')(el.nodeName)) { return }
-  if (el.nodeName == '#document-fragment') { return invoke(ripple)(el.host) }
-  if (el.nodeName == '#text') { return invoke(ripple)(el.parentNode) }
-  if (!el.matches(isAttached)) { return }
-  if (attr(el, 'inert') != null) { return }
-  return batch(ripple)(el), el
-}; };
-
-var render = function (ripple) { return function (el) {
-  var root = el.shadowRoot || el
-    , deps = attr(el, 'data')
-    , data = bodies(ripple)(deps)
-    , fn   = body(ripple)(lo(el.tagName))
-    , isClass = fn && fn.prototype && fn.prototype.render;
-
-  if (!fn) { return el }
-  if (deps && !data) { return el }
-  if (isClass && root.class != fn) {
-    Object.getOwnPropertyNames((root.class = fn).prototype)
-      .map(function (method) { return root[method] = fn.prototype[method].bind(root); });
-
-    Promise
-      .resolve((root.init || noop).call(root, root, root.state = root.state || {}))
-      .then(function (d) { return ripple.draw(root.initialised = root); });
-    return el
-  }
-  if (isClass && !root.initialised) { return }
-
-  try {
-    (root.render || fn).call(root, root, defaults(el, data));
-  } catch (e) {
-    err$$1(e, e.stack);
+  function isFunction(d) {
+      return typeof d == 'function';
   }
 
-  return el
-}; };
+  function isBoolean(d) {
+      return typeof d == 'boolean';
+  }
 
-// helpers
-var defaults = function (el, data) {
-  el.state = el.state || {};
-  overwrite(el.state)(data);
-  overwrite(el.state)(el.__data__);
-  el.__data__ = el.state;
-  return el.state
-};
+  function isString(d) {
+      return typeof d == 'string';
+  }
 
-var bodies = function (ripple) { return function (deps) {
-  var o = {}
-    , names = deps ? deps.split(' ') : [];
+  function isNumber(d) {
+      return typeof d == 'number';
+  }
 
-  names.map(function (d) { return o[d] = body(ripple)(d); });
+  function isObject(d) {
+      return typeof d == 'object';
+  }
 
-  return !names.length            ? undefined
-       : values(o).some(is_1.falsy) ? undefined 
-       : o
-}; };
+  function isLiteral(d) {
+      return d.constructor == Object;
+  }
 
-var body = function (ripple) { return function (name) { return ripple.resources[name] && ripple.resources[name].body; }; };
+  function isTruthy(d) {
+      return !(!d) == true;
+  }
 
-var log$$1 = log('[ri/components]')
-    , err$$1 = err('[ri/components]')
-    , mutation = client && window.MutationRecord || noop
-    , customs = client && !!window.document.registerElement
-    , isAttached = customs
-                  ? 'html *, :host-context(html) *'
-                  : 'html *';
-client && (window.Element.prototype.matches = window.Element.prototype.matches || window.Element.prototype.msMatchesSelector);
-});
+  function isFalsy(d) {
+      return !(!d) == false;
+  }
 
-return components;
+  function isArray(d) {
+      return d instanceof Array;
+  }
+
+  function isNull(d) {
+      return d === null;
+  }
+
+  function isDef(d) {
+      return typeof d !== 'undefined';
+  }
+
+  function isPromise(d) {
+      return d instanceof Promise;
+  }
+
+  function isStream(d) {
+      return !(!(d && d.next));
+  }
+
+  function isIn(set) {
+      return function (d) {
+          return !set ? false : set.indexOf ? ~set.indexOf(d) : d in set;
+      };
+  }
+
+  var to = {
+      arr: toArray,
+      obj: toObject
+  };
+  function toArray(d) {
+      return Array.prototype.slice.call(d, 0);
+  }
+
+  function toObject(d) {
+      var by = 'id';
+      return arguments.length == 1 ? (by = d, reduce) : reduce.apply(this, arguments);
+      function reduce(p, v, i) {
+          if (i === 0) 
+              { p = {}; }
+          p[is_1.fn(by) ? by(v, i) : v[by]] = v;
+          return p;
+      }
+      
+  }
+
+  var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+  function createCommonjsModule(fn, module) {
+  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
+
+  var client$1 = typeof window != 'undefined';
+
+  var owner = client$1 ? window : commonjsGlobal;
+
+  var log = function log(ns) {
+      return function (d) {
+          if (!owner.console || !console.log.apply) 
+              { return d; }
+          is_1.arr(arguments[2]) && (arguments[2] = arguments[2].length);
+          var args = to.arr(arguments), prefix = '[log][' + new Date().toISOString() + ']' + ns;
+          args.unshift(prefix.grey ? prefix.grey : prefix);
+          return console.log.apply(console, args), d;
+      };
+  };
+
+  var _class = createCommonjsModule(function (module) {
+      module.exports = (function (definition) { return symbol in definition ? definition[symbol] : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition); });
+      var symbol = module.exports.symbol = Symbol('class');
+      var classed = function (render) { return (function () {
+              function anonymous () {}
+
+              anonymous.prototype.render = function render$1 () {
+              render.apply(this, arguments);
+          };
+
+              return anonymous;
+          }()); };
+  });
+  var _class_1 = _class.symbol;
+
+  var promise_1 = promise;
+  function promise() {
+      var resolve, reject, p = new Promise(function (res, rej) {
+          resolve = res, reject = rej;
+      });
+      arguments.length && resolve(arguments[0]);
+      p.resolve = resolve;
+      p.reject = reject;
+      return p;
+  }
+
+  var flatten = function flatten(p, v) {
+      if (v instanceof Array) 
+          { v = v.reduce(flatten, []); }
+      return p = p || [], p.concat(v);
+  };
+
+  var has = function has(o, k) {
+      return k in o;
+  };
+
+  var def = function def(o, p, v, w) {
+      if (o.host && o.host.nodeName) 
+          { o = o.host; }
+      if (p.name) 
+          { v = p, p = p.name; }
+      !has(o, p) && Object.defineProperty(o, p, {
+          value: v,
+          writable: w
+      });
+      return o[p];
+  };
+
+  var noop = function () {};
+  var emitterify = function emitterify(body, hooks) {
+      body = body || {};
+      hooks = hooks || {};
+      def(body, 'emit', emit, 1);
+      def(body, 'once', once, 1);
+      def(body, 'off', off, 1);
+      def(body, 'on', on, 1);
+      body.on['*'] = body.on['*'] || [];
+      return body;
+      function emit(type, pm, filter) {
+          var li = body.on[type.split('.')[0]] || [], results = [];
+          for (var i = 0;i < li.length; i++) 
+              { if (!li[i].ns || !filter || filter(li[i].ns)) 
+              { results.push(call(li[i].isOnce ? li.splice(i--, 1)[0] : li[i], pm)); } }
+          for (var i = 0;i < body.on['*'].length; i++) 
+              { results.push(call(body.on['*'][i], [type,pm])); }
+          return results.reduce(flatten, []);
+      }
+      
+      function call(cb, pm) {
+          return cb.next ? cb.next(pm) : pm instanceof Array ? cb.apply(body, pm) : cb.call(body, pm);
+      }
+      
+      function on(type, opts, isOnce) {
+          var id = type.split('.')[0], ns = type.split('.')[1], li = body.on[id] = body.on[id] || [], cb = typeof opts == 'function' ? opts : 0;
+          return !cb && ns ? (cb = body.on[id]['$' + ns]) ? cb : push(observable(body, opts)) : !cb && !ns ? push(observable(body, opts)) : cb && ns ? push((remove(li, body.on[id]['$' + ns] || -1), cb)) : cb && !ns ? push(cb) : false;
+          function push(cb) {
+              cb.isOnce = isOnce;
+              cb.type = id;
+              if (ns) 
+                  { body.on[id]['$' + (cb.ns = ns)] = cb; }
+              li.push(cb);
+              (hooks.on || noop)(cb);
+              return cb.next ? cb : body;
+          }
+          
+      }
+      
+      function once(type, callback) {
+          return body.on(type, callback, true);
+      }
+      
+      function remove(li, cb) {
+          var i = li.length;
+          while (~--i) 
+              { if (cb == li[i] || cb == li[i].fn || !cb) 
+              { (hooks.off || noop)(li.splice(i, 1)[0]); } }
+      }
+      
+      function off(type, cb) {
+          remove(body.on[type] || [], cb);
+          if (cb && cb.ns) 
+              { delete body.on[type]['$' + cb.ns]; }
+          return body;
+      }
+      
+      function observable(parent, opts) {
+          opts = opts || {};
+          var o = emitterify(opts.base || promise_1());
+          o.i = 0;
+          o.li = [];
+          o.fn = opts.fn;
+          o.parent = parent;
+          o.source = opts.fn ? o.parent.source : o;
+          o.on('stop', function (reason) {
+              o.type ? o.parent.off(o.type, o) : o.parent.off(o);
+              return o.reason = reason;
+          });
+          o.each = function (fn) {
+              var n = fn.next ? fn : observable(o, {
+                  fn: fn
+              });
+              o.li.push(n);
+              return n;
+          };
+          o.pipe = function (fn) {
+              return fn(o);
+          };
+          o.map = function (fn) {
+              return o.each(function (d, i, n) {
+                  return n.next(fn(d, i, n));
+              });
+          };
+          o.filter = function (fn) {
+              return o.each(function (d, i, n) {
+                  return fn(d, i, n) && n.next(d);
+              });
+          };
+          o.reduce = function (fn, acc) {
+              return o.each(function (d, i, n) {
+                  return n.next(acc = fn(acc, d, i, n));
+              });
+          };
+          o.unpromise = function () {
+              var n = observable(o, {
+                  base: {},
+                  fn: function (d) {
+                      return n.next(d);
+                  }
+              });
+              o.li.push(n);
+              return n;
+          };
+          o.next = function (value) {
+              o.resolve && o.resolve(value);
+              return o.li.length ? o.li.map(function (n) {
+                  return n.fn(value, n.i++, n);
+              }) : value;
+          };
+          o.until = function (stop) {
+              (stop.each || stop.then).call(stop, function (reason) {
+                  return o.source.emit('stop', reason);
+              });
+              return o;
+          };
+          o.off = function (fn) {
+              return remove(o.li, fn), o;
+          };
+          o.start = function (fn) {
+              o.source.emit('start');
+              return o;
+          };
+          o[Symbol.asyncIterator] = function () {
+              return {
+                  next: function () {
+                      return o.wait = new Promise(function (resolve) {
+                          o.wait = true;
+                          o.map(function (d, i, n) {
+                              delete o.wait;
+                              o.off(n);
+                              resolve({
+                                  value: d,
+                                  done: false
+                              });
+                          });
+                          o.emit('pull', o);
+                      });
+                  }
+              };
+          };
+          return o;
+      }
+      
+  };
+
+  var event = function event(node, index) {
+      node = node.host && node.host.nodeName ? node.host : node;
+      if (node.on) 
+          { return; }
+      node.listeners = {};
+      var on = function (o) {
+          var type = o.type.split('.').shift();
+          if (!node.listeners[type]) 
+              { node.addEventListener(type, node.listeners[type] = (function (event) { return !event.detail || !event.detail.emitted ? emit(type, event) : 0; })); }
+      };
+      var off = function (o) {
+          if (!node.on[o.type].length) {
+              node.removeEventListener(o.type, node.listeners[o.type]);
+              delete node.listeners[o.type];
+          }
+      };
+      emitterify(node, {
+          on: on,
+          off: off
+      });
+      var emit = node.emit;
+      node.emit = function (type, params) {
+          var detail = {
+              params: params,
+              emitted: true
+          }, event = new CustomEvent(type, {
+              detail: detail,
+              bubbles: false,
+              cancelable: true
+          });
+          node.dispatchEvent(event);
+          return emit(type, event);
+      };
+  };
+
+  var define = createCommonjsModule(function (module) {
+      var id = {
+          count: 0
+      }, noop = function () {}, HTMLElement = client$1 ? window.HTMLElement : (function () {
+          function anonymous () {}
+
+          return anonymous;
+      }());
+      module.exports = function define(name, component) {
+          if (arguments.length == 1) {
+              component = name, name = "anon-" + (id.count++);
+          }
+          if (!name.includes('-')) 
+              { return; }
+          if (!client$1) 
+              { return wrap(component); }
+          var wrapped = customElements.get(name);
+          if (wrapped) {
+              var instances = Array.from(document.querySelectorAll(name));
+              instances.map(function (node) {
+                  node.disconnectedCallback();
+                  node.methods.map(function (method) {
+                      delete node[method];
+                  });
+              });
+              wrapped[_class.symbol] = _class(component);
+              instances.map(function (node) { return node.connectedCallback(); });
+          } else {
+              customElements.define(name, wrapped = wrap(component));
+          }
+          return wrapped;
+      };
+      var wrap = function (component) {
+          var wrapper = (function (HTMLElement) {
+              function wrapper () {
+                  HTMLElement.apply(this, arguments);
+              }
+
+              if ( HTMLElement ) wrapper.__proto__ = HTMLElement;
+              wrapper.prototype = Object.create( HTMLElement && HTMLElement.prototype );
+              wrapper.prototype.constructor = wrapper;
+
+              wrapper.prototype.connectedCallback = function connectedCallback () {
+                  return (function ($return, $error) {
+                      var this$1 = this;
+
+                      var prototype;
+                      var assign;
+                      ((assign = wrapper[_class.symbol], prototype = assign.prototype));
+                      event(this);
+                      this.state = this.state || {};
+                      this.methods = Object.getOwnPropertyNames(prototype).filter(function (method) { return !(method in disallowed); }).map(function (method) { return (this$1[method] = prototype[method].bind(this$1), method); });
+                      return (this.connected || noop).call(this, this, this.state).then((function ($await_1) {
+                          this.initialised = true;
+                          this.render();
+                          return $return();
+                      }).$asyncbind(this, $error), $error);
+                  }).$asyncbind(this, true);
+              };
+              wrapper.prototype.render = function render () {
+                  return (function ($return, $error) {
+                      var prototype;
+                      var assign;
+                      ((assign = wrapper[_class.symbol], prototype = assign.prototype));
+                      if (!this.initialised) 
+                          { return $return(); }
+                      return prototype.render.call(this, this, this.state).then((function ($await_2) {
+                          return $return();
+                      }).$asyncbind(this, $error), $error);
+                  }).$asyncbind(this, true);
+              };
+              wrapper.prototype.disconnectedCallback = function disconnectedCallback () {
+                  (this.disconnected || noop).call(this, this, this.state);
+                  this.dispatchEvent(new CustomEvent('disconnected'));
+                  this.initialised = false;
+              };
+
+              return wrapper;
+          }(HTMLElement));
+          wrapper[_class.symbol] = _class(component);
+          return wrapper;
+      };
+      var disallowed = {
+          length: 1,
+          prototype: 1,
+          name: 1,
+          render: 1
+      };
+  });
+
+  var components = function components(ripple) {
+      if (!client) 
+          { return ripple; }
+      log$1('creating');
+      Node.prototype.render = function () {
+          var name = this.nodeName.toLowerCase();
+          if (name.includes('-')) 
+              { this.fn$ = this.fn$ || ripple.subscribe(name).map(function (component) { return define(name, component); }); }
+      };
+      Node.prototype.draw = function () {
+          this.render();
+      };
+      return ripple;
+  };
+  var log$1 = log('[ri/components]');
+
+  return components;
 
 }());

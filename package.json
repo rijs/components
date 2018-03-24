@@ -18,22 +18,15 @@
   },
   "license": "pemrouz.mit-license.org",
   "devDependencies": {
-    "chai": "*",
-    "coveralls": "*",
-    "istanbul": "*",
-    "mocha": "*",
-    "mocha-lcov-reporter": "*",
-    "popper": "pemrouz/popper",
-    "rijs.core": "*",
-    "rijs.data": "*",
-    "rijs.fn": "*",
     "rollup": "*",
     "rollup-plugin-buble": "^0.16.0",
     "rollup-plugin-commonjs": "^8.2.1",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "uglify-es": "*"
+    "rollup-plugin-nodent": "^0.2.2",
+    "uglify-es": "^3.3.10"
   },
   "dependencies": {
+    "@compone/define": "^1.0.2",
     "utilise": "*"
   }
 }
