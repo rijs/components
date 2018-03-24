@@ -19,12 +19,11 @@ module.exports = function components(ripple){
     this.render() 
   }
 
-  ready(function(){
-    const start = document.querySelectorAll('*')
-      .filter(d => d.includes('-'))
-      .map(node => node.render())
-  })
-  
+  ready(() => Array.from(document.querySelectorAll('*'))
+    .filter(d => d.includes('-'))
+    .map(node => node.render())
+  )
+
   return ripple
 }
 
