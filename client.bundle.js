@@ -121,6 +121,10 @@ var components = (function () {
       };
   };
 
+  var ready = function ready(fn) {
+      return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn.bind(this));
+  };
+
   var _class = createCommonjsModule(function (module) {
       module.exports = (function (definition) { return symbol in definition ? definition[symbol] : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition); });
       var symbol = module.exports.symbol = Symbol('class');
@@ -452,6 +456,9 @@ var components = (function () {
       Node.prototype.draw = function () {
           this.render();
       };
+      ready(function () {
+          var start = document.querySelectorAll('*').filter(function (d) { return d.includes('-'); }).map(function (node) { return node.render(); });
+      });
       return ripple;
   };
   var log$1 = log('[ri/components]');
