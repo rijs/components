@@ -125,7 +125,10 @@ var components = (function () {
       return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn.bind(this));
   };
 
-  var _class = function (definition) { return definition.raw ? definition.raw : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition); };
+  var _class = function (definition) { return assign(definition.class ? definition.class : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition), {
+      raw: definition
+  }); };
+  var assign = Object.assign;
   var classed = function (render) { return (function () {
           function anonymous () {}
 
