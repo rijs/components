@@ -351,21 +351,25 @@ var components = (function () {
       };
   };
 
+  var client$1 = typeof window != 'undefined';
+
   var define = createCommonjsModule(function (module) {
-      var noop = function () {}, HTMLElement = client ? window.HTMLElement : (function () {
+      var noop = function () {}, HTMLElement = client$1 ? window.HTMLElement : (function () {
           function anonymous () {}
 
           return anonymous;
-      }());
+      }()), registry = client$1 ? window.customElements : {};
       module.exports = function define(name, component) {
           if (arguments.length == 1) {
-              component = name, name = "anon-" + (customElements.anon++);
+              component = name, name = "anon-" + (registry.anon++);
           }
+          if (component.wrapper) 
+              { return component.wrapper; }
           if (!name.includes('-')) 
               { return; }
-          if (!client) 
+          if (!client$1) 
               { return wrap(_class(component)); }
-          var wrapped = customElements.get(name);
+          var wrapped = registry.get(name);
           if (wrapped) {
               if (wrapped.class == _class(component)) 
                   { return wrapped; }
@@ -379,8 +383,7 @@ var components = (function () {
                   node.connectedCallback();
               });
           } else {
-              wrapped = wrap(_class(component));
-              customElements.define(name, wrapped);
+              registry.define(name, wrapped = wrap(_class(component)));
           }
           return wrapped;
       };
@@ -431,7 +434,7 @@ var components = (function () {
           name: 1,
           render: 1
       };
-      customElements.anon = customElements.anon || 1;
+      registry.anon = registry.anon || 1;
   });
 
   var components = function components(ripple) {
