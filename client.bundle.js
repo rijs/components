@@ -378,7 +378,7 @@ var components = (function () {
                       delete node[method];
                   });
               });
-              wrapped.raw = _class(component);
+              wrapped.class = _class(component);
               instances.map(function (node) { return node.connectedCallback(); });
           } else {
               customElements.define(name, wrapped = wrap(component));
@@ -401,7 +401,7 @@ var components = (function () {
 
                       var prototype;
                       var assign;
-                      ((assign = wrapper.raw, prototype = assign.prototype));
+                      ((assign = wrapper.class, prototype = assign.prototype));
                       event(this);
                       this.state = this.state || {};
                       this.methods = Object.getOwnPropertyNames(prototype).filter(function (method) { return !(method in disallowed); }).map(function (method) { return (this$1[method] = prototype[method].bind(this$1), method); });
@@ -416,7 +416,7 @@ var components = (function () {
                   return (function ($return, $error) {
                       var prototype;
                       var assign;
-                      ((assign = wrapper.raw, prototype = assign.prototype));
+                      ((assign = wrapper.class, prototype = assign.prototype));
                       if (!this.initialised) 
                           { return $return(); }
                       return prototype.render.call(this, this, this.state).then((function ($await_2) {
@@ -432,7 +432,7 @@ var components = (function () {
 
               return wrapper;
           }(HTMLElement));
-          wrapper.raw = _class(component);
+          wrapper.class = _class(component);
           return wrapper;
       };
       var disallowed = {
