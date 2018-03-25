@@ -354,11 +354,11 @@ var components = (function () {
   var client$1 = typeof window != 'undefined';
 
   var define = createCommonjsModule(function (module) {
-      var noop = function () {}, HTMLElement = client$1 ? window.HTMLElement : (function () {
+      var noop = function () {}, HTMLElement = client$1 && window.HTMLElement || (function () {
           function anonymous () {}
 
           return anonymous;
-      }()), registry = client$1 ? window.customElements : {};
+      }()), registry = client$1 && window.customElements || {};
       module.exports = function define(name, component) {
           if (arguments.length == 1) {
               component = name, name = "anon-" + (registry.anon++);
