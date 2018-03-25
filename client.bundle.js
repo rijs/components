@@ -352,16 +352,14 @@ var components = (function () {
   };
 
   var define = createCommonjsModule(function (module) {
-      var id = {
-          count: 0
-      }, noop = function () {}, HTMLElement = client ? window.HTMLElement : (function () {
+      var noop = function () {}, HTMLElement = client ? window.HTMLElement : (function () {
           function anonymous () {}
 
           return anonymous;
       }());
       module.exports = function define(name, component) {
           if (arguments.length == 1) {
-              component = name, name = "anon-" + (id.count++);
+              component = name, name = "anon-" + (customElements.anon++);
           }
           if (!name.includes('-')) 
               { return; }
@@ -433,6 +431,7 @@ var components = (function () {
           name: 1,
           render: 1
       };
+      customElements.anon = customElements.anon || 1;
   });
 
   var components = function components(ripple) {
