@@ -125,20 +125,16 @@ var components = (function () {
       return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn.bind(this));
   };
 
-  var _class = createCommonjsModule(function (module) {
-      module.exports = (function (definition) { return symbol in definition ? definition[symbol] : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition); });
-      var symbol = module.exports.symbol = Symbol('class');
-      var classed = function (render) { return (function () {
-              function anonymous () {}
+  var _class = function (definition) { return definition.raw ? definition.raw : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition); };
+  var classed = function (render) { return (function () {
+          function anonymous () {}
 
-              anonymous.prototype.render = function render$1 () {
-              render.apply(this, arguments);
-          };
+          anonymous.prototype.render = function render$1 () {
+          render.apply(this, arguments);
+      };
 
-              return anonymous;
-          }()); };
-  });
-  var _class_1 = _class.symbol;
+          return anonymous;
+      }()); };
 
   var promise_1 = promise;
   function promise() {
@@ -379,7 +375,7 @@ var components = (function () {
                       delete node[method];
                   });
               });
-              wrapped[_class.symbol] = _class(component);
+              wrapped.raw = _class(component);
               instances.map(function (node) { return node.connectedCallback(); });
           } else {
               customElements.define(name, wrapped = wrap(component));
@@ -402,7 +398,7 @@ var components = (function () {
 
                       var prototype;
                       var assign;
-                      ((assign = wrapper[_class.symbol], prototype = assign.prototype));
+                      ((assign = wrapper.raw, prototype = assign.prototype));
                       event(this);
                       this.state = this.state || {};
                       this.methods = Object.getOwnPropertyNames(prototype).filter(function (method) { return !(method in disallowed); }).map(function (method) { return (this$1[method] = prototype[method].bind(this$1), method); });
@@ -417,7 +413,7 @@ var components = (function () {
                   return (function ($return, $error) {
                       var prototype;
                       var assign;
-                      ((assign = wrapper[_class.symbol], prototype = assign.prototype));
+                      ((assign = wrapper.raw, prototype = assign.prototype));
                       if (!this.initialised) 
                           { return $return(); }
                       return prototype.render.call(this, this, this.state).then((function ($await_2) {
@@ -433,7 +429,7 @@ var components = (function () {
 
               return wrapper;
           }(HTMLElement));
-          wrapper[_class.symbol] = _class(component);
+          wrapper.raw = _class(component);
           return wrapper;
       };
       var disallowed = {
