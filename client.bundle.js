@@ -397,33 +397,24 @@ var components = (function () {
               anonymous.prototype.constructor = anonymous;
 
               anonymous.prototype.connectedCallback = function connectedCallback () {
-                  return (function ($return, $error) {
-                      var this$1 = this;
+                  var this$1 = this;
 
-                      var prototype;
-                      var assign;
-                      ((assign = component.wrapper.class, prototype = assign.prototype));
-                      event(this);
-                      this.state = this.state || {};
-                      this.methods = Object.getOwnPropertyNames(prototype).filter(function (method) { return !(method in disallowed); }).map(function (method) { return (this$1[method] = prototype[method].bind(this$1), method); });
-                      return (this.connected || noop).call(this, this, this.state).then((function ($await_1) {
-                          this.initialised = true;
-                          this.render();
-                          return $return();
-                      }).$asyncbind(this, $error), $error);
-                  }).$asyncbind(this, true);
+                  var ref = component.wrapper.class;
+                  var prototype = ref.prototype;
+                  event(this);
+                  this.state = this.state || {};
+                  this.methods = Object.getOwnPropertyNames(prototype).filter(function (method) { return !(method in disallowed); }).map(function (method) { return (this$1[method] = prototype[method].bind(this$1), method); });
+                  return Promise.resolve((this.connected || noop).call(this, this, this.state)).then(function (d) {
+                      this$1.initialised = true;
+                      this$1.render();
+                  });
               };
               anonymous.prototype.render = function render () {
-                  return (function ($return, $error) {
-                      var prototype;
-                      var assign;
-                      ((assign = component.wrapper.class, prototype = assign.prototype));
-                      if (!this.initialised) 
-                          { return $return(); }
-                      return prototype.render.call(this, this, this.state).then((function ($await_2) {
-                          return $return();
-                      }).$asyncbind(this, $error), $error);
-                  }).$asyncbind(this, true);
+                  var ref = component.wrapper.class;
+                  var prototype = ref.prototype;
+                  if (!this.initialised) 
+                      { return; }
+                  return prototype.render.call(this, this, this.state);
               };
               anonymous.prototype.disconnectedCallback = function disconnectedCallback () {
                   (this.disconnected || noop).call(this, this, this.state);
