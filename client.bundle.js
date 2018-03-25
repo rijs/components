@@ -125,11 +125,9 @@ var components = (function () {
       return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn.bind(this));
   };
 
-  var _class = function (definition) { return assign(definition.class ? definition.class : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition), {
-      raw: definition
-  }); };
+  var _class = function (definition) { return assign(definition.class ? definition.class : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition)); };
   var assign = Object.assign;
-  var classed = function (render) { return (function () {
+  var classed = function (render) { return render.class = render.class || (function () {
           function anonymous () {}
 
           anonymous.prototype.render = function render$1 () {
@@ -368,40 +366,43 @@ var components = (function () {
           if (!name.includes('-')) 
               { return; }
           if (!client) 
-              { return wrap(component); }
+              { return wrap(_class(component)); }
           var wrapped = customElements.get(name);
           if (wrapped) {
+              if (wrapped.class == _class(component)) 
+                  { return wrapped; }
+              wrapped.class = _class(component);
               var instances = Array.from(document.querySelectorAll(name));
               instances.map(function (node) {
                   node.disconnectedCallback();
                   node.methods.map(function (method) {
                       delete node[method];
                   });
+                  node.connectedCallback();
               });
-              wrapped.class = _class(component);
-              instances.map(function (node) { return node.connectedCallback(); });
           } else {
-              customElements.define(name, wrapped = wrap(component));
+              wrapped = wrap(_class(component));
+              customElements.define(name, wrapped);
           }
           return wrapped;
       };
       var wrap = function (component) {
-          var wrapper = (function (HTMLElement) {
-              function wrapper () {
+          component.wrapper = component.wrapper || (function (HTMLElement) {
+              function anonymous () {
                   HTMLElement.apply(this, arguments);
               }
 
-              if ( HTMLElement ) wrapper.__proto__ = HTMLElement;
-              wrapper.prototype = Object.create( HTMLElement && HTMLElement.prototype );
-              wrapper.prototype.constructor = wrapper;
+              if ( HTMLElement ) anonymous.__proto__ = HTMLElement;
+              anonymous.prototype = Object.create( HTMLElement && HTMLElement.prototype );
+              anonymous.prototype.constructor = anonymous;
 
-              wrapper.prototype.connectedCallback = function connectedCallback () {
+              anonymous.prototype.connectedCallback = function connectedCallback () {
                   return (function ($return, $error) {
                       var this$1 = this;
 
                       var prototype;
                       var assign;
-                      ((assign = wrapper.class, prototype = assign.prototype));
+                      ((assign = component.wrapper.class, prototype = assign.prototype));
                       event(this);
                       this.state = this.state || {};
                       this.methods = Object.getOwnPropertyNames(prototype).filter(function (method) { return !(method in disallowed); }).map(function (method) { return (this$1[method] = prototype[method].bind(this$1), method); });
@@ -412,11 +413,11 @@ var components = (function () {
                       }).$asyncbind(this, $error), $error);
                   }).$asyncbind(this, true);
               };
-              wrapper.prototype.render = function render () {
+              anonymous.prototype.render = function render () {
                   return (function ($return, $error) {
                       var prototype;
                       var assign;
-                      ((assign = wrapper.class, prototype = assign.prototype));
+                      ((assign = component.wrapper.class, prototype = assign.prototype));
                       if (!this.initialised) 
                           { return $return(); }
                       return prototype.render.call(this, this, this.state).then((function ($await_2) {
@@ -424,16 +425,16 @@ var components = (function () {
                       }).$asyncbind(this, $error), $error);
                   }).$asyncbind(this, true);
               };
-              wrapper.prototype.disconnectedCallback = function disconnectedCallback () {
+              anonymous.prototype.disconnectedCallback = function disconnectedCallback () {
                   (this.disconnected || noop).call(this, this, this.state);
                   this.dispatchEvent(new CustomEvent('disconnected'));
                   this.initialised = false;
               };
 
-              return wrapper;
+              return anonymous;
           }(HTMLElement));
-          wrapper.class = _class(component);
-          return wrapper;
+          component.wrapper.class = component;
+          return component.wrapper;
       };
       var disallowed = {
           length: 1,
