@@ -6,9 +6,10 @@ module.exports = function components(ripple){
   Node.prototype.render = function(){
     const name = this.nodeName.toLowerCase()
     if (name.includes('-')) 
-      this.fn$ = this.fn$ || ripple
+      return this.fn$ = this.fn$ || ripple
         .subscribe(name)
         .map(component => define(name, component))
+        // TODO: test this works well across all instances
         // .until(new Promise(resolve => this.addEventListener('disconnected', () => {
         //   if (!this.isConnected) resolve()
         // })))
