@@ -125,9 +125,11 @@ var components = (function () {
       return document.body ? fn() : document.addEventListener('DOMContentLoaded', fn.bind(this));
   };
 
-  var _class = function (definition) { return assign(definition.class ? definition.class : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition)); };
+  var _class = function (definition) { return assign(definition.class ? definition.class : !definition.prototype ? classed(definition) : definition.prototype.render ? definition : definition.prototype.connected ? definition : classed(definition), {
+      raw: definition
+  }); };
   var assign = Object.assign;
-  var classed = function (render) { return render.class = render.class || (function () {
+  var classed = function (render) { return (function () {
           function anonymous () {}
 
           anonymous.prototype.render = function render$1 () {
@@ -281,17 +283,17 @@ var components = (function () {
               }) : value;
           };
           o.until = function (stop) {
-              (stop.each || stop.then).call(stop, function (reason) {
-                  return o.source.emit('stop', reason);
-              });
-              return o;
+              return stop.each ? stop.each(o.stop) : stop.then ? stop.then(o.stop) : stop.call ? o.filter(stop).map(o.stop) : 0;
           };
           o.off = function (fn) {
               return remove(o.li, fn), o;
           };
-          o.start = function (fn) {
+          o.start = function () {
               o.source.emit('start');
               return o;
+          };
+          o.stop = function (reason) {
+              return o.source.emit('stop', reason);
           };
           o[Symbol.asyncIterator] = function () {
               return {
@@ -324,10 +326,11 @@ var components = (function () {
       var on = function (o) {
           var type = o.type.split('.').shift();
           if (!node.listeners[type]) 
-              { node.addEventListener(type, node.listeners[type] = (function (event) { return !event.detail || !event.detail.emitted ? emit(type, event) : 0; })); }
+              { node.addEventListener(type, node.listeners[type] = (function (event) { return !event.detail || !event.detail.emitted ? emit(type, [event,
+              node.state,node]) : 0; })); }
       };
       var off = function (o) {
-          if (!node.on[o.type].length) {
+          if (!node.on[o.type] || !node.on[o.type].length) {
               node.removeEventListener(o.type, node.listeners[o.type]);
               delete node.listeners[o.type];
           }
@@ -363,7 +366,7 @@ var components = (function () {
           if (arguments.length == 1) {
               component = name, name = "anon-" + (registry.anon++);
           }
-          if (component.wrapper) 
+          if (component.hasOwnProperty('wrapper')) 
               { return component.wrapper; }
           if (!name.includes('-')) 
               { return; }
@@ -388,43 +391,50 @@ var components = (function () {
           return wrapped;
       };
       var wrap = function (component) {
-          component.wrapper = component.wrapper || (function (HTMLElement) {
-              function anonymous () {
-                  HTMLElement.apply(this, arguments);
+          if (!component.hasOwnProperty('wrapper')) 
+              { component.wrapper = (function (HTMLElement) {
+                      function undefined() {
+                  HTMLElement.call(this);
+                  event(this);
+                  this.ready = this.once('ready');
+                  this.state = this.state || {};
               }
 
-              if ( HTMLElement ) anonymous.__proto__ = HTMLElement;
-              anonymous.prototype = Object.create( HTMLElement && HTMLElement.prototype );
-              anonymous.prototype.constructor = anonymous;
-
-              anonymous.prototype.connectedCallback = function connectedCallback () {
+                      if ( HTMLElement ) undefined.__proto__ = HTMLElement;
+                      undefined.prototype = Object.create( HTMLElement && HTMLElement.prototype );
+                      undefined.prototype.constructor = undefined;
+              undefined.prototype.connectedCallback = function connectedCallback () {
                   var this$1 = this;
 
                   var ref = component.wrapper.class;
                   var prototype = ref.prototype;
-                  event(this);
-                  this.state = this.state || {};
                   this.methods = Object.getOwnPropertyNames(prototype).filter(function (method) { return !(method in disallowed); }).map(function (method) { return (this$1[method] = prototype[method].bind(this$1), method); });
                   return Promise.resolve((this.connected || noop).call(this, this, this.state)).then(function (d) {
-                      this$1.initialised = true;
-                      this$1.render();
+                      this$1.emit('ready');
+                      return this$1.render();
                   });
               };
-              anonymous.prototype.render = function render () {
+              undefined.prototype.render = function render () {
+                  var this$1 = this;
+
                   var ref = component.wrapper.class;
                   var prototype = ref.prototype;
-                  if (!this.initialised) 
-                      { return; }
-                  return prototype.render.call(this, this, this.state);
+                  return this.pending = this.pending || this.ready.then(function () {
+                      delete this$1.pending;
+                      return prototype.render.call(this$1, this$1, this$1.state);
+                  });
               };
-              anonymous.prototype.disconnectedCallback = function disconnectedCallback () {
+              undefined.prototype.disconnectedCallback = function disconnectedCallback () {
                   (this.disconnected || noop).call(this, this, this.state);
                   this.dispatchEvent(new CustomEvent('disconnected'));
                   this.initialised = false;
               };
+              undefined.prototype.get = function get (sel) {
+                  return this.querySelector(sel);
+              };
 
-              return anonymous;
-          }(HTMLElement));
+                      return undefined;
+                  }(HTMLElement)); }
           component.wrapper.class = component;
           return component.wrapper;
       };
@@ -444,7 +454,7 @@ var components = (function () {
       Node.prototype.render = function () {
           var name = this.nodeName.toLowerCase();
           if (name.includes('-')) 
-              { this.fn$ = this.fn$ || ripple.subscribe(name).map(function (component) { return define(name, component); }); }
+              { return this.fn$ = this.fn$ || ripple.subscribe(name).map(function (component) { return define(name, component); }); }
       };
       Node.prototype.draw = function () {
           this.render();
