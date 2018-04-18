@@ -480,22 +480,21 @@ var components = (function () {
       var wrap = function (component) {
           if (!component.hasOwnProperty('wrapper')) 
               { component.wrapper = (function (HTMLElement) {
-                      function undefined () {
-                          HTMLElement.apply(this, arguments);
-                      }
+                      function undefined() {
+                  HTMLElement.call(this);
+                  event$2(this);
+                  this.ready = this.once('ready');
+                  this.state = this.state || {};
+              }
 
                       if ( HTMLElement ) undefined.__proto__ = HTMLElement;
                       undefined.prototype = Object.create( HTMLElement && HTMLElement.prototype );
                       undefined.prototype.constructor = undefined;
-
-                      undefined.prototype.connectedCallback = function connectedCallback () {
+              undefined.prototype.connectedCallback = function connectedCallback () {
                   var this$1 = this;
 
                   var ref = component.wrapper.class;
                   var prototype = ref.prototype;
-                  event$2(this);
-                  this.ready = this.once('ready');
-                  this.state = this.state || {};
                   this.methods = Object.getOwnPropertyNames(prototype).filter(function (method) { return !(method in disallowed); }).map(function (method) { return (this$1[method] = prototype[method].bind(this$1), method); });
                   return Promise.resolve((this.connected || noop).call(this, this, this.state)).then(function (d) {
                       this$1.emit('ready');
