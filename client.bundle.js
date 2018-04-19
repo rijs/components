@@ -356,12 +356,13 @@ var components = (function () {
               }) : value;
           };
           o.until = function (stop) {
-              return stop.each ? stop.each(o.stop) : stop.then ? stop.then(o.stop) : stop.call ? o.filter(stop).map(o.stop) : 0;
+              return !stop ? 0 : stop.each ? stop.each(o.stop) : stop.then ? stop.then(o.stop) : stop.call ? o.filter(stop).map(o.stop) : 0;
           };
           o.off = function (fn) {
               return remove(o.li, fn), o;
           };
-          o.start = function () {
+          o.start = function (stop) {
+              o.until(stop);
               o.source.emit('start');
               return o;
           };
