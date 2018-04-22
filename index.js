@@ -5,7 +5,8 @@ module.exports = function components(ripple){
   // if no render is defined on a component, load up definition
   Node.prototype.render = function(){
     const name = this.nodeName.toLowerCase()
-    if (name.includes('-')) 
+    if (name.includes('-')) {
+      this.state = this.state || {}
       return this.fn$ = this.fn$ || ripple
         .subscribe(name)
         .map(component => define(name, component))
@@ -13,6 +14,7 @@ module.exports = function components(ripple){
         // .until(new Promise(resolve => this.addEventListener('disconnected', () => {
         //   if (!this.isConnected) resolve()
         // })))
+    }
   }
   
   // this is for backwards compatibility
