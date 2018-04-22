@@ -552,8 +552,10 @@ var components = (function () {
       log$2('creating');
       Node.prototype.render = function () {
           var name = this.nodeName.toLowerCase();
-          if (name.includes('-')) 
-              { return this.fn$ = this.fn$ || ripple.subscribe(name).map(function (component) { return define$2(name, component); }); }
+          if (name.includes('-')) {
+              this.state = this.state || {};
+              return this.fn$ = this.fn$ || ripple.subscribe(name).map(function (component) { return define$2(name, component); });
+          }
       };
       Node.prototype.draw = function () {
           this.render();
